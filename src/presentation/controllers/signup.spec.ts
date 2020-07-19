@@ -11,5 +11,6 @@ describe('component signUp controller', () => {
     }
     const response = systemUnderTest.handle(request)
     expect(response.statusCode).toBe(400)
+    expect(response.body).toEqual(new Error('Missing param: name'))
   })
 })
