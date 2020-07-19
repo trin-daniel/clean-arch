@@ -1,4 +1,4 @@
-import { MissingParam } from '../errors/missingParam'
+import { MissingParamError } from '../errors/missing-param'
 import { SignUpController } from './signup'
 describe('component signUp controller', () => {
   test('Should return error 400 if not specify name of client', () => {
@@ -12,7 +12,7 @@ describe('component signUp controller', () => {
     }
     const response = systemUnderTest.handle(request)
     expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new MissingParam('name'))
+    expect(response.body).toEqual(new MissingParamError('name'))
   })
 
   test('Should return error 400 if not specify e-mail of client', () => {
@@ -26,6 +26,6 @@ describe('component signUp controller', () => {
     }
     const response = systemUnderTest.handle(request)
     expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new MissingParam('email'))
+    expect(response.body).toEqual(new MissingParamError('email'))
   })
 })
