@@ -19,7 +19,7 @@ describe('component signUp controller', () => {
     const systemUnderTest = new SignUpController()
     const request = {
       body: {
-        name: 'any_email@gmail.com',
+        name: 'any_name',
         password: 'any_password',
         confirmation: 'value equal of password field'
       }
@@ -27,5 +27,19 @@ describe('component signUp controller', () => {
     const response = systemUnderTest.handle(request)
     expect(response.statusCode).toBe(400)
     expect(response.body).toEqual(new MissingParamError('email'))
+  })
+
+  test('Should return error 400 if not specify password of client', () => {
+    const systemUnderTest = new SignUpController()
+    const request = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        confirmation: 'value equal of password field'
+      }
+    }
+    const response = systemUnderTest.handle(request)
+    expect(response.statusCode).toBe(400)
+    expect(response.body).toEqual(new MissingParamError('password'))
   })
 })
