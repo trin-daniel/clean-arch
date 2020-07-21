@@ -1,4 +1,8 @@
-import { MissingParamError, InvalidParamErrors, ServerError } from '../errors'
+import {
+  MissingParamError,
+  InvalidParamErrors,
+  ServerError
+} from '../errors'
 import { SignUpController } from './signup'
 import { EmailValidator } from '../protocols'
 
@@ -6,14 +10,25 @@ interface SystemUnderTestTypes{
   systemUnderTest: SignUpController,
   emailValidatorStub: EmailValidator
 }
-
-const makeSystemUnderTest = (): SystemUnderTestTypes => {
+const makeEmailValidator = ():EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email:string):boolean {
       return true
     }
   }
-  const emailValidatorStub = new EmailValidatorStub()
+  return new EmailValidatorStub()
+}
+const makeEmailValidatorWithError = ():EmailValidator => {
+  class EmailValidatorStub implements EmailValidator {
+    isValid (email:string):boolean {
+      throw new Error()
+    }
+  }
+  return new EmailValidatorStub()
+}
+
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
+  const emailValidatorStub = makeEmailValidator()
   const systemUnderTest = new SignUpController(emailValidatorStub)
   return {
     systemUnderTest,
@@ -111,12 +126,7 @@ describe('component signUp controller', () => {
   })
 
   test('Should return error 500 if an exception occurs', () => {
-    class EmailValidatorStub implements EmailValidator {
-      isValid ():boolean {
-        throw new Error()
-      }
-    }
-    const emailValidatorStub = new EmailValidatorStub()
+    const emailValidatorStub = makeEmailValidatorWithError()
     const systemUnderTest = new SignUpController(emailValidatorStub)
     const request = {
       body: {
