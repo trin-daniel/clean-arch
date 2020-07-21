@@ -1,8 +1,12 @@
 import { MissingParamError } from '../errors/missing-param'
 import { SignUpController } from './signup'
+
+const makeSystemUnderTest = (): SignUpController => {
+  return new SignUpController()
+}
 describe('component signUp controller', () => {
   test('Should return error 400 if not specify name of client', () => {
-    const systemUnderTest = new SignUpController()
+    const systemUnderTest = makeSystemUnderTest()
     const request = {
       body: {
         email: 'any_email@gmail.com',
@@ -16,7 +20,7 @@ describe('component signUp controller', () => {
   })
 
   test('Should return error 400 if not specify e-mail of client', () => {
-    const systemUnderTest = new SignUpController()
+    const systemUnderTest = makeSystemUnderTest()
     const request = {
       body: {
         name: 'any_name',
@@ -30,7 +34,7 @@ describe('component signUp controller', () => {
   })
 
   test('Should return error 400 if not specify password of client', () => {
-    const systemUnderTest = new SignUpController()
+    const systemUnderTest = makeSystemUnderTest()
     const request = {
       body: {
         name: 'any_name',
@@ -44,7 +48,7 @@ describe('component signUp controller', () => {
   })
 
   test('Should return error 400 if not specify password confirmation of client', () => {
-    const systemUnderTest = new SignUpController()
+    const systemUnderTest = makeSystemUnderTest()
     const request = {
       body: {
         name: 'any_name',
