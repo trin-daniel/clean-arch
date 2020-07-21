@@ -94,4 +94,19 @@ describe('component signUp controller', () => {
     expect(response.statusCode).toBe(400)
     expect(response.body).toEqual(new InvalidParamErrors('email'))
   })
+
+  test('Should call emailValidator with correct email', () => {
+    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
+    const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
+    const request = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+        confirmation: 'value equal of password field'
+      }
+    }
+    systemUnderTest.handle(request)
+    expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
+  })
 })
