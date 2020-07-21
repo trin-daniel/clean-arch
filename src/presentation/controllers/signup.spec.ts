@@ -1,6 +1,6 @@
 import { MissingParamError, InvalidParamErrors, ServerError } from '../errors'
 import { SignUpController } from './signup'
-import { EmailValidator } from '../protocols/email-validator'
+import { EmailValidator } from '../protocols'
 
 interface SystemUnderTestTypes{
   systemUnderTest: SignUpController,
