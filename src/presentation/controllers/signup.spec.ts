@@ -2,6 +2,7 @@ import { MissingParamError } from '../errors/missing-param'
 import { InvalidParamErrors } from '../errors/invalid-param'
 import { SignUpController } from './signup'
 import { EmailValidator } from '../protocols/email-validator'
+import { ServerError } from '../errors/server-error'
 
 interface SystemUnderTestTypes{
   systemUnderTest: SignUpController,
@@ -21,6 +22,7 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
     emailValidatorStub
   }
 }
+
 describe('component signUp controller', () => {
   test('Should return error 400 if not specify name of client', () => {
     const { systemUnderTest } = makeSystemUnderTest()
@@ -108,5 +110,26 @@ describe('component signUp controller', () => {
     }
     systemUnderTest.handle(request)
     expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
+  })
+
+  test('Should return error 500 if an exception occurs', () => {
+    class EmailValidatorStub implements EmailValidator {
+      isValid ():boolean {
+        throw new Error()
+      }
+    }
+    const emailValidatorStub = new EmailValidatorStub()
+    const systemUnderTest = new SignUpController(emailValidatorStub)
+    const request = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+        confirmation: 'value equal of password field'
+      }
+    }
+    const response = systemUnderTest.handle(request)
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual(new ServerError())
   })
 })
