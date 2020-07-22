@@ -127,7 +127,7 @@ describe('component signUp controller', () => {
     expect(response.body).toEqual(new InvalidParamErrors('confirmation'))
   })
 
-  test('Should return error 400 if an invalid email is provider', () => {
+  test('Should return error 400 if an invalid email is provided', () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     jest.spyOn(emailValidatorStub, 'isValid')
       .mockReturnValueOnce(false)
@@ -213,6 +213,26 @@ describe('component signUp controller', () => {
       name: 'any_name',
       email: 'any_email@gmail.com',
       password: 'any_password'
+    })
+  })
+
+  test('Should return 200 if valid data is provided', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const request = {
+      body: {
+        name: 'valid_name',
+        email: 'valid_email@gmail.com',
+        password: 'valid_password',
+        confirmation: 'valid_password'
+      }
+    }
+    const response = systemUnderTest.handle(request)
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toEqual({
+      id: 'valid_id',
+      name: 'valid_name',
+      email: 'valid_email',
+      password: 'valid_password'
     })
   })
 })
