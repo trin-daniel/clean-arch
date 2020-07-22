@@ -6,11 +6,16 @@ import {
   EmailValidator,
   Controller
 } from '../protocols'
+import { AddAccount } from '../../domain/usecases/add-account'
 
 export class SignUpController implements Controller {
   constructor (
-    private readonly email:EmailValidator
-  ) { this.email }
+    private readonly email:EmailValidator,
+    private readonly addAccount: AddAccount
+  ) {
+    this.email
+    this.addAccount
+  }
 
   handle (request:Request): Response {
     try {
@@ -20,14 +25,20 @@ export class SignUpController implements Controller {
           return badRequest(new MissingParamError(field))
         }
       }
-      const { email, password, confirmation } = request.body
+      const { name, email, password, confirmation } = request.body
       const isValid = this.email.isValid(email)
+
       if (!isValid) {
         return badRequest(new InvalidParamErrors('email'))
       }
       if (password !== confirmation) {
         return badRequest(new InvalidParamErrors('confirmation'))
       }
+      this.addAccount.add({
+        name,
+        email,
+        password
+      })
     } catch (err) {
       return serverError()
     }
