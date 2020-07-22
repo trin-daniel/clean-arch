@@ -85,6 +85,21 @@ describe('component signUp controller', () => {
     expect(response.body).toEqual(new MissingParamError('confirmation'))
   })
 
+  test('Should return error 400 if password confirmation fails', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const request = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        password: 'any_value',
+        confirmation: 'invalid_value'
+      }
+    }
+    const response = systemUnderTest.handle(request)
+    expect(response.statusCode).toBe(400)
+    expect(response.body).toEqual(new InvalidParamErrors('confirmation'))
+  })
+
   test('Should return error 400 if an invalid email is provider', () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     jest.spyOn(emailValidatorStub, 'isValid')
