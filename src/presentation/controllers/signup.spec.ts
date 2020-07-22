@@ -5,11 +5,9 @@ import {
 } from '../errors'
 import { SignUpController } from './signup'
 import { EmailValidator } from '../protocols'
+import { AddAccount, AddAccountModel } from '../../domain/usecases/add-account'
+import { AccountModel } from '../../domain/models/account'
 
-interface SystemUnderTestTypes{
-  systemUnderTest: SignUpController,
-  emailValidatorStub: EmailValidator
-}
 const makeEmailValidator = ():EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email:string):boolean {
@@ -19,12 +17,33 @@ const makeEmailValidator = ():EmailValidator => {
   return new EmailValidatorStub()
 }
 
+const makeAddAccount = (): AddAccount => {
+  class AddAccountStub implements AddAccount {
+    add (account: AddAccountModel):AccountModel {
+      return {
+        id: 'valid_id',
+        name: 'valid_name',
+        email: 'valid_email',
+        password: 'valid_password'
+      }
+    }
+  }
+  return new AddAccountStub()
+}
+
+interface SystemUnderTestTypes{
+  systemUnderTest: SignUpController,
+  emailValidatorStub: EmailValidator,
+  addAccountStub: AddAccount
+}
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const emailValidatorStub = makeEmailValidator()
-  const systemUnderTest = new SignUpController(emailValidatorStub)
+  const addAccountStub = makeAddAccount()
+  const systemUnderTest = new SignUpController(emailValidatorStub, addAccountStub)
   return {
     systemUnderTest,
-    emailValidatorStub
+    emailValidatorStub,
+    addAccountStub
   }
 }
 
@@ -149,5 +168,24 @@ describe('component signUp controller', () => {
     const response = systemUnderTest.handle(request)
     expect(response.statusCode).toBe(500)
     expect(response.body).toEqual(new ServerError())
+  })
+
+  test('Should call addAccount with correct values', () => {
+    const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
+    const addSpy = jest.spyOn(addAccountStub, 'add')
+    const request = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+        confirmation: 'any_password'
+      }
+    }
+    systemUnderTest.handle(request)
+    expect(addSpy).toHaveBeenCalledWith({
+      name: 'any_name',
+      email: 'any_email@gmail.com',
+      password: 'any_password'
+    })
   })
 })
