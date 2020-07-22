@@ -18,14 +18,6 @@ const makeEmailValidator = ():EmailValidator => {
   }
   return new EmailValidatorStub()
 }
-const makeEmailValidatorWithError = ():EmailValidator => {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (email:string):boolean {
-      throw new Error()
-    }
-  }
-  return new EmailValidatorStub()
-}
 
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const emailValidatorStub = makeEmailValidator()
@@ -126,8 +118,11 @@ describe('component signUp controller', () => {
   })
 
   test('Should return error 500 if an exception occurs', () => {
-    const emailValidatorStub = makeEmailValidatorWithError()
-    const systemUnderTest = new SignUpController(emailValidatorStub)
+    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
+    jest.spyOn(emailValidatorStub, 'isValid')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
     const request = {
       body: {
         name: 'any_name',
