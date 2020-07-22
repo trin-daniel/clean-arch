@@ -7,7 +7,8 @@ import
 import
 {
   badRequest,
-  serverError
+  serverError,
+  success
 } from '../../helpers/http-helper'
 
 import
@@ -50,10 +51,7 @@ export class SignUpController implements Controller {
         email,
         password
       })
-      return {
-        statusCode: 200,
-        body: account
-      }
+      return success(account)
     } catch (err) {
       return serverError()
     }
