@@ -178,6 +178,25 @@ describe('component signUp controller', () => {
     expect(response.body).toEqual(new ServerError())
   })
 
+  test('Should return error 500 if an exception occurs in addAccount', () => {
+    const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
+    jest.spyOn(addAccountStub, 'add')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
+    const request = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+        confirmation: 'any_password'
+      }
+    }
+    const response = systemUnderTest.handle(request)
+    expect(response.statusCode).toBe(500)
+    expect(response.body).toEqual(new ServerError())
+  })
+
   test('Should call addAccount with correct values', () => {
     const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
     const addSpy = jest.spyOn(addAccountStub, 'add')
