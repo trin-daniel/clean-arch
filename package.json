@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --passWithNoTests --runInBand",
-    "test:unit": "npm test -- --watch -c test-unit.js",
-    "test:integration": "npm test -- --watch -c test-integration.js",
-    "test:staged": "npm test -- --findRelatedTests",
-    "test:ci": "npm test -- --coverage"
+    "test:unit": "jest --passWithNoTests --watch -c test-unit.js",
+    "test:integration": "jest --passWithNoTests --watch -c test-integration.js",
+    "test:staged": "jest --passWithNoTests --findRelatedTests",
+    "test:ci": "jest --passWithNoTests --coverage"
   },
   "keywords": [],
   "author": "",
