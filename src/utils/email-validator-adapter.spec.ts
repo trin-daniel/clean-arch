@@ -1,5 +1,5 @@
-import { EmailValidatorAdapter } from '../utils/email-validator'
 import validator from 'validator'
+import { EmailValidatorAdapter } from '../utils/email-validator-adapter'
 import { EmailValidator } from '../presentation/protocols/email-validator'
 
 const makeSystemUnderTest = (): EmailValidator => {
