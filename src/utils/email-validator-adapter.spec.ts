@@ -1,5 +1,10 @@
 import { EmailValidatorAdapter } from '../utils/email-validator'
 import validator from 'validator'
+import { EmailValidator } from '../presentation/protocols/email-validator'
+
+const makeSystemUnderTest = (): EmailValidator => {
+  return new EmailValidatorAdapter()
+}
 
 jest.mock('validator', () => ({
   isEmail ():boolean {
@@ -7,9 +12,9 @@ jest.mock('validator', () => ({
   }
 }))
 
-describe('EmailValidator adapter', () => {
+describe('Email Validator adapter', () => {
   test('Should return false if validator returns false', () => {
-    const systemUnderTest = new EmailValidatorAdapter()
+    const systemUnderTest = makeSystemUnderTest()
     jest.spyOn(validator, 'isEmail')
       .mockReturnValueOnce(false)
 
@@ -18,13 +23,13 @@ describe('EmailValidator adapter', () => {
   })
 
   test('Should return true if validator returns true', () => {
-    const systemUnderTest = new EmailValidatorAdapter()
+    const systemUnderTest = makeSystemUnderTest()
     const isValid = systemUnderTest.isValid('valid_email@gmail.com')
     expect(isValid).toBe(true)
   })
 
   test('Should call validator with correct email', () => {
-    const systemUnderTest = new EmailValidatorAdapter()
+    const systemUnderTest = makeSystemUnderTest()
     const isEmailSpy = jest.spyOn(validator, 'isEmail')
     systemUnderTest.isValid('any_email@gmail.com')
     expect(isEmailSpy).toHaveBeenCalledWith('any_email@gmail.com')
