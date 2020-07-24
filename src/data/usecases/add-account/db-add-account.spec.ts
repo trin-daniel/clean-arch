@@ -1,10 +1,12 @@
 import { DbAddAccount } from '../add-account/db-add-account'
-import { Encrypter } from './db-add-account-protocols'
+import
+{
+  AccountModel,
+  AddAccountModel,
+  AddAccountRepository,
+  Encrypter
+} from './db-add-account-protocols'
 
-interface SystemUnderTestTypes{
-  systemUnderTest: DbAddAccount,
-  encrypterStub: Encrypter
-}
 const makeEncrypter = ():Encrypter => {
   class EncrypterStub implements Encrypter {
     encrypt (value:string):Promise<string> {
@@ -15,12 +17,33 @@ const makeEncrypter = ():Encrypter => {
   }
   return new EncrypterStub()
 }
+const makeAddAccountRepostory = ():AddAccountRepository => {
+  class AddAccountRepositoryStub implements AddAccountRepository {
+    public async add (account: AddAccountModel): Promise<AccountModel> {
+      return new Promise(resolve => resolve({
+        id: 'valid_id',
+        name: 'valid_name',
+        email: 'valid_email@gmail.com',
+        password: 'hashed_password'
+      }))
+    }
+  }
+  return new AddAccountRepositoryStub()
+}
+interface SystemUnderTestTypes{
+  systemUnderTest: DbAddAccount,
+  encrypterStub: Encrypter
+  addAccountRepositoryStub: AddAccountRepository
+}
+
 const makeSystemUnderTest = ():SystemUnderTestTypes => {
   const encrypterStub = makeEncrypter()
-  const systemUnderTest = new DbAddAccount(encrypterStub)
+  const addAccountRepositoryStub = makeAddAccountRepostory()
+  const systemUnderTest = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
   return {
     systemUnderTest,
-    encrypterStub
+    encrypterStub,
+    addAccountRepositoryStub
   }
 }
 
@@ -50,5 +73,21 @@ describe('dbAddAccount usecase', () => {
     }
     const promise = systemUnderTest.add(account)
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call AddAccountRepository with correct values', async () => {
+    const { systemUnderTest, addAccountRepositoryStub } = makeSystemUnderTest()
+    const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
+    const account = {
+      name: 'valid_name',
+      email: 'valid_email@gmail.com',
+      password: 'valid_password'
+    }
+    await systemUnderTest.add(account)
+    expect(addSpy).toHaveBeenCalledWith({
+      name: 'valid_name',
+      email: 'valid_email@gmail.com',
+      password: 'hashed_password'
+    })
   })
 })
