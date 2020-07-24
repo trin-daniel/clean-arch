@@ -104,4 +104,20 @@ describe('dbAddAccount usecase', () => {
     const promise = systemUnderTest.add(account)
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return account in case success in creation', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const account = {
+      name: 'valid_name',
+      email: 'valid_email@gmail.com',
+      password: 'hashed_password'
+    }
+    const accountReturned = await systemUnderTest.add(account)
+    expect(accountReturned).toEqual({
+      id: 'valid_id',
+      name: 'valid_name',
+      email: 'valid_email@gmail.com',
+      password: 'hashed_password'
+    })
+  })
 })
