@@ -25,4 +25,12 @@ describe('Cryptographic password layer', () => {
     const hash = await systemUnderTest.encrypt('any_value')
     expect(hash).toBe('hash_final')
   })
+
+  test('Should throw if bcrypt throws', async () => {
+    const systemUnderTest = makeSystemUnderTest()
+    jest.spyOn(bcrypt, 'hash')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = systemUnderTest.encrypt('any_value')
+    await expect(promise).rejects.toThrow()
+  })
 })
