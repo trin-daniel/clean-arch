@@ -10,6 +10,11 @@
     "test:staged": "jest --passWithNoTests --runInBand --findRelatedTests",
     "test:ci": "jest --passWithNoTests --runInBand --coverage"
   },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "latest"
+    }
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
