@@ -5,6 +5,7 @@ declare const process:{
     MONGO_URL: string
   }
 }
+
 describe('Account mongo repository', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
