@@ -13,8 +13,8 @@ import
 
 import
 {
-  Request,
-  Response,
+  HttpRequest,
+  HttpResponse,
   EmailValidator,
   Controller,
   AddAccount
@@ -29,7 +29,7 @@ export class SignUpController implements Controller {
     this.addAccount
   }
 
-  async handle (request:Request): Promise<Response> {
+  async handle (request:HttpRequest): Promise<HttpResponse> {
     try {
       const requiredFields = ['name', 'email', 'password', 'confirmation']
       for (const field of requiredFields) {

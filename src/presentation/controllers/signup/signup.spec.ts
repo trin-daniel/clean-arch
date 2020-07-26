@@ -15,7 +15,6 @@ import
   AddAccount,
   AddAccountModel
 } from './signup-protocols'
-import { rejects } from 'assert'
 
 const makeEmailValidator = ():EmailValidator => {
   class EmailValidatorStub implements EmailValidator {

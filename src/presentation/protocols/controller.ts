@@ -1,4 +1,4 @@
-import { Request, Response } from './http'
+import { HttpRequest, HttpResponse } from './http'
 export interface Controller {
-  handle(request: Request): Promise<Response>
+  handle(request: HttpRequest): Promise<HttpResponse>
 }
