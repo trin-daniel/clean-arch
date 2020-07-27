@@ -5,11 +5,9 @@ import
   HttpRequest,
   HttpResponse
 } from '../../presentation/protocols'
+import { LogErrorRepository } from '../../data/protocols/log-error-repository'
+import { serverError } from '../../presentation/helpers/http-helper'
 
-interface SystemUnderTest {
-  systemUnderTest:LogControllerDecorator
-  controllerStub: Controller,
-}
 const makeController = ():Controller => {
   class ControllerStub implements Controller {
     public async handle (request:HttpRequest):Promise<HttpResponse> {
@@ -27,13 +25,27 @@ const makeController = ():Controller => {
   }
   return new ControllerStub()
 }
-
+const makeLogErrorRepository = ():LogErrorRepository => {
+  class LogErrorRepositoryStub implements LogErrorRepository {
+    public async log (stack: string):Promise<void> {
+      return new Promise(resolve => resolve())
+    }
+  }
+  return new LogErrorRepositoryStub()
+}
+interface SystemUnderTest {
+  systemUnderTest:LogControllerDecorator
+  controllerStub: Controller,
+  logErrorRepositoryStub: LogErrorRepository
+}
 const makeSystemUnderTest = ():SystemUnderTest => {
   const controllerStub = makeController()
-  const systemUnderTest = new LogControllerDecorator(controllerStub)
+  const logErrorRepositoryStub = makeLogErrorRepository()
+  const systemUnderTest = new LogControllerDecorator(controllerStub, logErrorRepositoryStub)
   return {
     systemUnderTest,
-    controllerStub
+    controllerStub,
+    logErrorRepositoryStub
   }
 }
 
@@ -73,5 +85,24 @@ describe('LogController Decorator', () => {
         confirmation: 'any_password'
       }
     })
+  })
+  test('Should call LogErrorRepository with correct error if controller a server error', async () => {
+    const { controllerStub, systemUnderTest, logErrorRepositoryStub } = makeSystemUnderTest()
+    const fakeError = new Error()
+    fakeError.stack = 'any_error'
+    const error = serverError(fakeError)
+    const logSpy = jest.spyOn(logErrorRepositoryStub, 'log')
+    jest.spyOn(controllerStub, 'handle')
+      .mockReturnValueOnce(new Promise(resolve => resolve(error)))
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@gmail.com',
+        password: 'any_password',
+        confirmation: 'any_password'
+      }
+    }
+    await systemUnderTest.handle(httpRequest)
+    expect(logSpy).toHaveBeenCalledWith('any_error')
   })
 })
