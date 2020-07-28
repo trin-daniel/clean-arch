@@ -2,10 +2,12 @@ import { LoginController } from './login'
 import { badRequest, serverError } from '../../helpers/http-helper'
 import { MissingParamError, InvalidParamErrors } from '../../errors'
 import { EmailValidator, HttpRequest } from '../signup/signup-protocols'
+import { Authentication } from '../../../domain/usecases/authentication'
 
 interface SystemUnderTestTypes{
   systemUnderTest: LoginController
   emailValidatorStub: EmailValidator
+  authenticationStub: Authentication
 }
 const makeEmailValidator = (): EmailValidator => {
   class EmailvaliadatorStub implements EmailValidator {
@@ -16,12 +18,23 @@ const makeEmailValidator = (): EmailValidator => {
   return new EmailvaliadatorStub()
 }
 
+const makeAuthentication = ():Authentication => {
+  class AuthenticationStub implements Authentication {
+    async auth (email:string, password:string):Promise<string> {
+      return new Promise(resolve => resolve('any_token'))
+    }
+  }
+  return new AuthenticationStub()
+}
+
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const emailValidatorStub = makeEmailValidator()
-  const systemUnderTest = new LoginController(emailValidatorStub)
+  const authenticationStub = makeAuthentication()
+  const systemUnderTest = new LoginController(emailValidatorStub, authenticationStub)
   return {
     systemUnderTest,
-    emailValidatorStub
+    emailValidatorStub,
+    authenticationStub
   }
 }
 
@@ -74,10 +87,21 @@ describe('Login Controller', () => {
 
   test('Should return 500 if EmailValidator throws', async () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
-      throw new Error()
-    })
+    jest.spyOn(emailValidatorStub, 'isValid')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
     const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should call Authentication with correct values', async () => {
+    const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
+    const authSpy = jest.spyOn(authenticationStub, 'auth')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
+    await systemUnderTest.handle(makeFakeRequest())
+    expect(authSpy).toHaveBeenCalledWith('any_email@gmail.com', 'any_password')
   })
 })
