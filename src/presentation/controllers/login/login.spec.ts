@@ -1,6 +1,6 @@
 import { LoginController } from './login'
 import { badRequest } from '../../helpers/http-helper'
-import { MissingParamError } from '../../errors'
+import { MissingParamError, InvalidParamErrors } from '../../errors'
 import { EmailValidator } from '../signup/signup-protocols'
 
 interface SystemUnderTestTypes{
@@ -48,6 +48,20 @@ describe('Login Controller', () => {
     const error = new MissingParamError('password')
     const response = await systemUnderTest.handle(request)
     expect(response).toEqual(badRequest(error))
+  })
+
+  test('Should return 400 if an invalid email is provided', async () => {
+    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
+    jest.spyOn(emailValidatorStub, 'isValid')
+      .mockReturnValueOnce(false)
+    const request = {
+      body: {
+        email: 'any_email@gmail.com',
+        password: 'any_password'
+      }
+    }
+    const response = await systemUnderTest.handle(request)
+    expect(response).toEqual(badRequest(new InvalidParamErrors('email')))
   })
 
   test('Should call Emailvaliadator with correct email', async () => {
