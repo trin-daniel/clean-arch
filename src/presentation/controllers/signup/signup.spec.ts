@@ -60,9 +60,9 @@ const makeFakeRequest = ():HttpRequest => ({
 
 const makeFakeAccount = ():AccountModel => ({
   id: 'valid_id',
-  name: 'valid_name',
-  email: 'valid_email',
-  password: 'valid_password'
+  name: 'any_name',
+  email: 'any_email@gmail.com',
+  password: 'any_password'
 })
 
 describe('component signUp controller', () => {
