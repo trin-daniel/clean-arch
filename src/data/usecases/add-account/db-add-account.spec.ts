@@ -20,12 +20,7 @@ const makeEncrypter = ():Encrypter => {
 const makeAddAccountRepostory = ():AddAccountRepository => {
   class AddAccountRepositoryStub implements AddAccountRepository {
     public async add (account: AddAccountModel): Promise<AccountModel> {
-      return new Promise(resolve => resolve({
-        id: 'valid_id',
-        name: 'valid_name',
-        email: 'valid_email@gmail.com',
-        password: 'hashed_password'
-      }))
+      return new Promise(resolve => resolve(makeFakeAccount()))
     }
   }
   return new AddAccountRepositoryStub()
@@ -46,17 +41,24 @@ const makeSystemUnderTest = ():SystemUnderTestTypes => {
     addAccountRepositoryStub
   }
 }
+const makeFakeAccount = ():AccountModel => ({
+  id: 'valid_id',
+  name: 'valid_name',
+  email: 'valid_email@gmail.com',
+  password: 'hashed_password'
+})
+
+const makeFakeAccountData = ():AddAccountModel => ({
+  name: 'valid_name',
+  email: 'valid_email@gmail.com',
+  password: 'valid_password'
+})
 
 describe('dbAddAccount usecase', () => {
   test('Should call encrypter with correct password', async () => {
     const { encrypterStub, systemUnderTest } = makeSystemUnderTest()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
-    const account = {
-      name: 'valid_name',
-      email: 'valid_email@gmail.com',
-      password: 'valid_password'
-    }
-    await systemUnderTest.add(account)
+    await systemUnderTest.add(makeFakeAccountData())
     expect(encryptSpy).toHaveBeenCalledWith('valid_password')
   })
 
@@ -66,24 +68,14 @@ describe('dbAddAccount usecase', () => {
       .mockReturnValueOnce(
         new Promise((resolve, reject) => reject(new Error()))
       )
-    const account = {
-      name: 'valid_name',
-      email: 'valid_email@gmail.com',
-      password: 'valid_password'
-    }
-    const promise = systemUnderTest.add(account)
+    const promise = systemUnderTest.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
   })
 
   test('Should call AddAccountRepository with correct values', async () => {
     const { systemUnderTest, addAccountRepositoryStub } = makeSystemUnderTest()
     const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
-    const account = {
-      name: 'valid_name',
-      email: 'valid_email@gmail.com',
-      password: 'valid_password'
-    }
-    await systemUnderTest.add(account)
+    await systemUnderTest.add(makeFakeAccountData())
     expect(addSpy).toHaveBeenCalledWith({
       name: 'valid_name',
       email: 'valid_email@gmail.com',
@@ -96,28 +88,13 @@ describe('dbAddAccount usecase', () => {
       .mockReturnValueOnce(
         new Promise((resolve, reject) => reject(new Error()))
       )
-    const account = {
-      name: 'valid_name',
-      email: 'valid_email@gmail.com',
-      password: 'valid_password'
-    }
-    const promise = systemUnderTest.add(account)
+    const promise = systemUnderTest.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
   })
 
   test('Should return account in case success in creation', async () => {
     const { systemUnderTest } = makeSystemUnderTest()
-    const account = {
-      name: 'valid_name',
-      email: 'valid_email@gmail.com',
-      password: 'hashed_password'
-    }
-    const accountReturned = await systemUnderTest.add(account)
-    expect(accountReturned).toEqual({
-      id: 'valid_id',
-      name: 'valid_name',
-      email: 'valid_email@gmail.com',
-      password: 'hashed_password'
-    })
+    const accountReturned = await systemUnderTest.add(makeFakeAccountData())
+    expect(accountReturned).toEqual(makeFakeAccount())
   })
 })
