@@ -7,6 +7,10 @@ declare const process:{
   }
 }
 
+const makeSystemUnderTest = ():LogMongoRepository => {
+  return new LogMongoRepository()
+}
+
 describe('Log Mongo Repository', () => {
   let errorCollection:Collection
   beforeAll(async () => {
@@ -21,7 +25,7 @@ describe('Log Mongo Repository', () => {
     await errorCollection.deleteMany({})
   })
   test('Should create an error log on success', async () => {
-    const systemUnderTest = new LogMongoRepository()
+    const systemUnderTest = makeSystemUnderTest()
     await systemUnderTest.logError('any_error')
     const count = await errorCollection.countDocuments()
     expect(count).toBe(1)
