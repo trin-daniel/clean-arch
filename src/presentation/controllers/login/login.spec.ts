@@ -1,7 +1,7 @@
 import { LoginController } from './login'
 import { badRequest } from '../../helpers/http-helper'
 import { MissingParamError, InvalidParamErrors } from '../../errors'
-import { EmailValidator } from '../signup/signup-protocols'
+import { EmailValidator, HttpRequest } from '../signup/signup-protocols'
 
 interface SystemUnderTestTypes{
   systemUnderTest: LoginController
@@ -24,6 +24,13 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
     emailValidatorStub
   }
 }
+
+const makeFakeRequest = ():HttpRequest => ({
+  body: {
+    email: 'any_email@gmail.com',
+    password: 'any_password'
+  }
+})
 
 describe('Login Controller', () => {
   test('Should return 400 if no email is provided', async () => {
@@ -54,26 +61,14 @@ describe('Login Controller', () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     jest.spyOn(emailValidatorStub, 'isValid')
       .mockReturnValueOnce(false)
-    const request = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
+    const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(badRequest(new InvalidParamErrors('email')))
   })
 
   test('Should call Emailvaliadator with correct email', async () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    const request = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password'
-      }
-    }
-    await systemUnderTest.handle(request)
+    await systemUnderTest.handle(makeFakeRequest())
     expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
   })
 })
