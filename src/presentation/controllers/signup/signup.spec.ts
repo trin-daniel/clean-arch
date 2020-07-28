@@ -6,15 +6,14 @@ import
 } from '../../errors'
 import
 {
-  SignUpController
-} from './signup'
-import
-{
   EmailValidator,
   AccountModel,
   AddAccount,
   AddAccountModel
 } from './signup-protocols'
+import { SignUpController } from './signup'
+import { HttpRequest } from '../../protocols'
+import { success, serverError, badRequest } from '../../helpers/http-helper'
 
 const makeEmailValidator = ():EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
@@ -28,14 +27,7 @@ const makeEmailValidator = ():EmailValidator => {
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
     async add (account: AddAccountModel):Promise<AccountModel> {
-      return new Promise((resolve) => resolve(
-        {
-          id: 'valid_id',
-          name: 'valid_name',
-          email: 'valid_email',
-          password: 'valid_password'
-        }
-      ))
+      return new Promise((resolve) => resolve(makeFakeAccount()))
     }
   }
   return new AddAccountStub()
@@ -57,6 +49,22 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
   }
 }
 
+const makeFakeRequest = ():HttpRequest => ({
+  body: {
+    name: 'any_name',
+    email: 'any_email@gmail.com',
+    password: 'any_password',
+    confirmation: 'any_password'
+  }
+})
+
+const makeFakeAccount = ():AccountModel => ({
+  id: 'valid_id',
+  name: 'valid_name',
+  email: 'valid_email',
+  password: 'valid_password'
+})
+
 describe('component signUp controller', () => {
   test('Should return error 400 if not specify name of client', async () => {
     const { systemUnderTest } = makeSystemUnderTest()
@@ -68,8 +76,7 @@ describe('component signUp controller', () => {
       }
     }
     const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new MissingParamError('name'))
+    expect(response).toEqual(badRequest(new MissingParamError('name')))
   })
 
   test('Should return error 400 if not specify e-mail of client', async () => {
@@ -82,8 +89,7 @@ describe('component signUp controller', () => {
       }
     }
     const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new MissingParamError('email'))
+    expect(response).toEqual(badRequest(new MissingParamError('email')))
   })
 
   test('Should return error 400 if not specify password of client', async () => {
@@ -96,8 +102,7 @@ describe('component signUp controller', () => {
       }
     }
     const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new MissingParamError('password'))
+    expect(response).toEqual(badRequest(new MissingParamError('password')))
   })
 
   test('Should return error 400 if not specify password confirmation of client', async () => {
@@ -110,8 +115,7 @@ describe('component signUp controller', () => {
       }
     }
     const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new MissingParamError('confirmation'))
+    expect(response).toEqual(badRequest(new MissingParamError('confirmation')))
   })
 
   test('Should return error 400 if password confirmation fails', async () => {
@@ -125,39 +129,22 @@ describe('component signUp controller', () => {
       }
     }
     const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new InvalidParamErrors('confirmation'))
+    expect(response).toEqual(badRequest(new InvalidParamErrors('confirmation')))
   })
 
   test('Should return error 400 if an invalid email is provided', async () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     jest.spyOn(emailValidatorStub, 'isValid')
       .mockReturnValueOnce(false)
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'invalid_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'value equal of password field'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(400)
-    expect(response.body).toEqual(new InvalidParamErrors('email'))
+
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(badRequest(new InvalidParamErrors('email')))
   })
 
   test('Should call emailValidator with correct email', async () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'value equal of password field'
-      }
-    }
-    await systemUnderTest.handle(request)
+    await systemUnderTest.handle(makeFakeRequest())
     expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
   })
 
@@ -167,17 +154,9 @@ describe('component signUp controller', () => {
       .mockImplementationOnce(() => {
         throw new Error()
       })
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'value equal of password field'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(500)
-    expect(response.body).toEqual(new ServerError())
+
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(serverError(new ServerError()))
   })
 
   test('Should return error 500 if an exception occurs in addAccount', async () => {
@@ -188,31 +167,15 @@ describe('component signUp controller', () => {
           reject(new Error())
         })
       })
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'any_password'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(500)
-    expect(response.body).toEqual(new ServerError())
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(serverError(new ServerError()))
   })
 
   test('Should call addAccount with correct values', async () => {
     const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
     const addSpy = jest.spyOn(addAccountStub, 'add')
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'any_password'
-      }
-    }
-    await systemUnderTest.handle(request)
+
+    await systemUnderTest.handle(makeFakeRequest())
     expect(addSpy).toHaveBeenCalledWith({
       name: 'any_name',
       email: 'any_email@gmail.com',
@@ -222,21 +185,7 @@ describe('component signUp controller', () => {
 
   test('Should return 200 if valid data is provided', async () => {
     const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        name: 'valid_name',
-        email: 'valid_email@gmail.com',
-        password: 'valid_password',
-        confirmation: 'valid_password'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response.statusCode).toBe(200)
-    expect(response.body).toEqual({
-      id: 'valid_id',
-      name: 'valid_name',
-      email: 'valid_email',
-      password: 'valid_password'
-    })
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(success(makeFakeAccount()))
   })
 })
