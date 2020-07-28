@@ -13,4 +13,16 @@ describe('Login Controller', () => {
     const response = await systemUnderTest.handle(request)
     expect(response).toEqual(badRequest(error))
   })
+
+  test('Should return 400 if no password is provided', async () => {
+    const systemUnderTest = new LoginController()
+    const request = {
+      body: {
+        email: 'any_email@gmail.com'
+      }
+    }
+    const error = new MissingParamError('password')
+    const response = await systemUnderTest.handle(request)
+    expect(response).toEqual(badRequest(error))
+  })
 })
