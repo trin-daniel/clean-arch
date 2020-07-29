@@ -83,20 +83,6 @@ const makeFakeAccount = ():AccountModel => ({
 })
 
 describe('component signUp controller', () => {
-  test('Should return error 400 if password confirmation fails', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        password: 'any_value',
-        confirmation: 'invalid_value'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(new InvalidParamErrors('confirmation')))
-  })
-
   test('Should return error 400 if an invalid email is provided', async () => {
     const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
     jest.spyOn(emailValidatorStub, 'isValid')
