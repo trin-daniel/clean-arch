@@ -83,58 +83,6 @@ const makeFakeAccount = ():AccountModel => ({
 })
 
 describe('component signUp controller', () => {
-  test('Should return error 400 if not specify name of client', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        email: 'any_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'value equal of password field'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(new MissingParamError('name')))
-  })
-
-  test('Should return error 400 if not specify e-mail of client', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        name: 'any_name',
-        password: 'any_password',
-        confirmation: 'value equal of password field'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(new MissingParamError('email')))
-  })
-
-  test('Should return error 400 if not specify password of client', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        confirmation: 'value equal of password field'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(new MissingParamError('password')))
-  })
-
-  test('Should return error 400 if not specify password confirmation of client', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@gmail.com',
-        password: 'value equal of password field'
-      }
-    }
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(new MissingParamError('confirmation')))
-  })
-
   test('Should return error 400 if password confirmation fails', async () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const request = {
