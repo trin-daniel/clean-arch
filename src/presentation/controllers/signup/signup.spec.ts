@@ -79,7 +79,7 @@ describe('component signUp controller', () => {
         })
       })
     const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(serverError(new ServerError()))
+    expect(response).toEqual(serverError(new ServerError(new Error())))
   })
 
   test('Should call addAccount with correct values', async () => {
