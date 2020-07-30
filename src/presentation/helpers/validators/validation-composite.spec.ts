@@ -36,7 +36,7 @@ describe('Validation Composite', () => {
     expect(error).toEqual(new MissingParamError('field'))
   })
 
-  test('Should return the first error if more than one validation fails', () => {
+  test('Should return the first error if more then one validation fails', () => {
     const { systemUnderTest, validationStubs } = makeSystemUnderTest()
     jest.spyOn(validationStubs[0], 'validate')
       .mockReturnValueOnce(
@@ -48,5 +48,11 @@ describe('Validation Composite', () => {
       )
     const error = systemUnderTest.validate({ field: 'any_value' })
     expect(error).toEqual(new Error())
+  })
+
+  test('Should not return if validation succeeds', () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const error = systemUnderTest.validate({ field: 'any_value' })
+    expect(error).toBeFalsy()
   })
 })
