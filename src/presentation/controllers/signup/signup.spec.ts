@@ -15,7 +15,7 @@ import
   success,
   serverError,
   badRequest
-} from '../../helpers/http-helper'
+} from '../../helpers/http/http-helper'
 import { SignUpController } from './signup'
 import { HttpRequest } from '../../protocols'
 
