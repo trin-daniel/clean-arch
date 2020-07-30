@@ -1,11 +1,5 @@
 import
 {
-  MissingParamError,
-  InvalidParamErrors
-} from '../../errors'
-
-import
-{
   badRequest,
   serverError,
   success
@@ -15,7 +9,6 @@ import
 {
   HttpRequest,
   HttpResponse,
-  EmailValidator,
   Controller,
   AddAccount,
   Validation
@@ -23,11 +16,9 @@ import
 
 export class SignUpController implements Controller {
   constructor (
-    private readonly email:EmailValidator,
     private readonly addAccount: AddAccount,
     private readonly validation:Validation
   ) {
-    this.email
     this.addAccount
     this.validation
   }
@@ -40,11 +31,6 @@ export class SignUpController implements Controller {
       }
 
       const { name, email, password } = request.body
-      const isValid = this.email.isValid(email)
-
-      if (!isValid) {
-        return badRequest(new InvalidParamErrors('email'))
-      }
       const account = await this.addAccount.add({
         name,
         email,

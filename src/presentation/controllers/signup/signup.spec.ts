@@ -1,29 +1,23 @@
 import
 {
   MissingParamError,
-  InvalidParamErrors,
   ServerError
 } from '../../errors'
 import
 {
-  EmailValidator,
   AccountModel,
   AddAccount,
   AddAccountModel,
   Validation
 } from './signup-protocols'
+import
+{
+  success,
+  serverError,
+  badRequest
+} from '../../helpers/http-helper'
 import { SignUpController } from './signup'
 import { HttpRequest } from '../../protocols'
-import { success, serverError, badRequest } from '../../helpers/http-helper'
-
-const makeEmailValidator = ():EmailValidator => {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (email:string):boolean {
-      return true
-    }
-  }
-  return new EmailValidatorStub()
-}
 
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
@@ -45,22 +39,15 @@ const makeValidation = (): Validation => {
 
 interface SystemUnderTestTypes{
   systemUnderTest: SignUpController,
-  emailValidatorStub: EmailValidator,
   addAccountStub: AddAccount,
   validationStub: Validation
 }
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
-  const emailValidatorStub = makeEmailValidator()
   const addAccountStub = makeAddAccount()
   const validationStub = makeValidation()
-  const systemUnderTest = new SignUpController(
-    emailValidatorStub,
-    addAccountStub,
-    validationStub
-  )
+  const systemUnderTest = new SignUpController(addAccountStub, validationStub)
   return {
     systemUnderTest,
-    emailValidatorStub,
     addAccountStub,
     validationStub
   }
@@ -83,33 +70,6 @@ const makeFakeAccount = ():AccountModel => ({
 })
 
 describe('component signUp controller', () => {
-  test('Should return error 400 if an invalid email is provided', async () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid')
-      .mockReturnValueOnce(false)
-
-    const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(badRequest(new InvalidParamErrors('email')))
-  })
-
-  test('Should call emailValidator with correct email', async () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    await systemUnderTest.handle(makeFakeRequest())
-    expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
-  })
-
-  test('Should return error 500 if an exception occurs', async () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid')
-      .mockImplementationOnce(() => {
-        throw new Error()
-      })
-
-    const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(serverError(new ServerError()))
-  })
-
   test('Should return error 500 if an exception occurs in addAccount', async () => {
     const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
     jest.spyOn(addAccountStub, 'add')
