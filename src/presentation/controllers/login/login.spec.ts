@@ -1,20 +1,21 @@
 import { LoginController } from './login'
 import { badRequest, serverError, unauthorized, success } from '../../helpers/http-helper'
-import { MissingParamError, InvalidParamErrors } from '../../errors'
-import { EmailValidator, HttpRequest, Authentication } from './login-protocols'
+import { MissingParamError } from '../../errors'
+import { HttpRequest, Authentication, Validation } from './login-protocols'
 
 interface SystemUnderTestTypes{
   systemUnderTest: LoginController
-  emailValidatorStub: EmailValidator
   authenticationStub: Authentication
+  validationStub: Validation
 }
-const makeEmailValidator = (): EmailValidator => {
-  class EmailvaliadatorStub implements EmailValidator {
-    isValid (email:string): boolean {
-      return true
+
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
+    validate (input:any):Error {
+      return null
     }
   }
-  return new EmailvaliadatorStub()
+  return new ValidationStub()
 }
 
 const makeAuthentication = ():Authentication => {
@@ -27,13 +28,13 @@ const makeAuthentication = ():Authentication => {
 }
 
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
-  const emailValidatorStub = makeEmailValidator()
+  const validationStub = makeValidation()
   const authenticationStub = makeAuthentication()
-  const systemUnderTest = new LoginController(emailValidatorStub, authenticationStub)
+  const systemUnderTest = new LoginController(validationStub, authenticationStub)
   return {
     systemUnderTest,
-    emailValidatorStub,
-    authenticationStub
+    authenticationStub,
+    validationStub
   }
 }
 
@@ -45,55 +46,6 @@ const makeFakeRequest = ():HttpRequest => ({
 })
 
 describe('Login Controller', () => {
-  test('Should return 400 if no email is provided', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        password: 'any_password'
-      }
-    }
-    const error = new MissingParamError('email')
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(error))
-  })
-
-  test('Should return 400 if no password is provided', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = {
-      body: {
-        email: 'any_email@gmail.com'
-      }
-    }
-    const error = new MissingParamError('password')
-    const response = await systemUnderTest.handle(request)
-    expect(response).toEqual(badRequest(error))
-  })
-
-  test('Should return 400 if an invalid email is provided', async () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid')
-      .mockReturnValueOnce(false)
-    const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(badRequest(new InvalidParamErrors('email')))
-  })
-
-  test('Should call Emailvaliadator with correct email', async () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    await systemUnderTest.handle(makeFakeRequest())
-    expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
-  })
-
-  test('Should return 500 if EmailValidator throws', async () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid')
-      .mockImplementationOnce(() => {
-        throw new Error()
-      })
-    const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(serverError(new Error()))
-  })
-
   test('Should call Authentication with correct values', async () => {
     const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
     const authSpy = jest.spyOn(authenticationStub, 'auth')
@@ -128,5 +80,25 @@ describe('Login Controller', () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(success({ accessToken: 'any_token' }))
+  })
+
+  test('Should call Validation with correct values', async () => {
+    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    const validateSpy = jest.spyOn(validationStub, 'validate')
+    const request = makeFakeRequest()
+    await systemUnderTest.handle(request)
+    expect(validateSpy).toHaveBeenCalledWith(request.body)
+  })
+
+  test('Should return 400 if Validation returns an error', async () => {
+    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    jest.spyOn(validationStub, 'validate')
+      .mockReturnValueOnce(
+        new MissingParamError('any_field')
+      )
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(
+      badRequest(new MissingParamError('any_field'))
+    )
   })
 })
