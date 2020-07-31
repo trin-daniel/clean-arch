@@ -3,6 +3,7 @@ import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by
 import { DbAuthentication } from './db-authentication'
 import { AuthenticationModel } from '../../../domain/usecases/authentication'
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
+import { TokenGenerator } from '../../protocols/cryptography/token-generator'
 
 const makeFakeAccount = ():AccountModel => ({
   id: 'any_id',
@@ -29,6 +30,15 @@ const makeHashComparer = ():HashComparer => {
   return new HashComparerStub()
 }
 
+const makeTokenGenerator = (): TokenGenerator => {
+  class TokenGeneratorStub implements TokenGenerator {
+    async generate (id:string):Promise<string> {
+      return new Promise(resolve => resolve('any_token'))
+    }
+  }
+  return new TokenGeneratorStub()
+}
+
 const makeFakeAuthentication = ():AuthenticationModel => ({
   email: 'any_email@gmail.com',
   password: 'any_password'
@@ -36,18 +46,21 @@ const makeFakeAuthentication = ():AuthenticationModel => ({
 
 interface SystemUnderTestTypes{
   systemUnderTest:DbAuthentication,
-  loadAccountByEmailRepositoryStub:LoadAccountByEmailRepository
-  hashComparerStub: HashComparer
+  loadAccountByEmailRepositoryStub:LoadAccountByEmailRepository,
+  hashComparerStub: HashComparer,
+  tokenGeneratorStub: TokenGenerator
 }
 
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
   const hashComparerStub = makeHashComparer()
-  const systemUnderTest = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub)
+  const tokenGeneratorStub = makeTokenGenerator()
+  const systemUnderTest = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub, tokenGeneratorStub)
   return {
     loadAccountByEmailRepositoryStub,
     systemUnderTest,
-    hashComparerStub
+    hashComparerStub,
+    tokenGeneratorStub
   }
 }
 
@@ -116,5 +129,15 @@ describe('DbAuthentication usecase', () => {
     jest.spyOn(hashComparerStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)))
     const accessToken = await systemUnderTest.auth(makeFakeAuthentication())
     expect(accessToken).toBeNull()
+  })
+
+  test('Should call TokenGenerator with correct id', async () => {
+    const {
+      systemUnderTest,
+      tokenGeneratorStub
+    } = makeSystemUnderTest()
+    const generateSpy = jest.spyOn(tokenGeneratorStub, 'generate')
+    await systemUnderTest.auth(makeFakeAuthentication())
+    expect(generateSpy).toHaveBeenCalledWith('any_id')
   })
 })
