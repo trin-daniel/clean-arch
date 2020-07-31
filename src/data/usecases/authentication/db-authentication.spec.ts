@@ -2,12 +2,13 @@ import { AccountModel } from '../../../domain/models/account'
 import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by-email-repository'
 import { DbAuthentication } from './db-authentication'
 import { AuthenticationModel } from '../../../domain/usecases/authentication'
+import { HashComparer } from '../../protocols/cryptography/hash-comparer'
 
 const makeFakeAccount = ():AccountModel => ({
   id: 'any_id',
   name: 'any_name',
   email: 'any_email@gmail.com',
-  password: 'any_password'
+  password: 'hashed_password'
 })
 
 const makeLoadAccountByEmailRepository = ():LoadAccountByEmailRepository => {
@@ -19,6 +20,15 @@ const makeLoadAccountByEmailRepository = ():LoadAccountByEmailRepository => {
   return new LoadAccountByEmailRepositoryStub()
 }
 
+const makeHashComparer = ():HashComparer => {
+  class HashComparerStub implements HashComparer {
+    async compare (password: string, hash: string):Promise<boolean> {
+      return new Promise(resolve => resolve(true))
+    }
+  }
+  return new HashComparerStub()
+}
+
 const makeFakeAuthentication = ():AuthenticationModel => ({
   email: 'any_email@gmail.com',
   password: 'any_password'
@@ -27,14 +37,17 @@ const makeFakeAuthentication = ():AuthenticationModel => ({
 interface SystemUnderTestTypes{
   systemUnderTest:DbAuthentication,
   loadAccountByEmailRepositoryStub:LoadAccountByEmailRepository
+  hashComparerStub: HashComparer
 }
 
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
-  const systemUnderTest = new DbAuthentication(loadAccountByEmailRepositoryStub)
+  const hashComparerStub = makeHashComparer()
+  const systemUnderTest = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub)
   return {
     loadAccountByEmailRepositoryStub,
-    systemUnderTest
+    systemUnderTest,
+    hashComparerStub
   }
 }
 
@@ -70,5 +83,15 @@ describe('DbAuthentication usecase', () => {
     jest.spyOn(loadAccountByEmailRepositoryStub, 'load').mockReturnValueOnce(null)
     const accessToken = await systemUnderTest.auth(makeFakeAuthentication())
     expect(accessToken).toBeNull()
+  })
+
+  test('Should call HashComparer with correct values', async () => {
+    const {
+      systemUnderTest,
+      hashComparerStub
+    } = makeSystemUnderTest()
+    const compareSpy = jest.spyOn(hashComparerStub, 'compare')
+    await systemUnderTest.auth(makeFakeAuthentication())
+    expect(compareSpy).toHaveBeenCalledWith('any_password', 'hashed_password')
   })
 })
