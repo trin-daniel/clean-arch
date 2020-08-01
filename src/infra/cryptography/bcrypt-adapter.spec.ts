@@ -29,7 +29,7 @@ describe('Cryptographic password layer', () => {
     expect(hash).toBe('hash_final')
   })
 
-  test('Should throw if bcrypt throws', async () => {
+  test('Should throw if hash throws', async () => {
     const systemUnderTest = makeSystemUnderTest()
     jest.spyOn(bcrypt, 'hash')
       .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
@@ -57,5 +57,13 @@ describe('Cryptographic password layer', () => {
       )
     const available = await systemUnderTest.compare('any_value', 'any_hash')
     expect(available).toBe(false)
+  })
+
+  test('Should throw if compare throws', async () => {
+    const systemUnderTest = makeSystemUnderTest()
+    jest.spyOn(bcrypt, 'compare')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const promise = systemUnderTest.compare('any_value', 'any_hash')
+    await expect(promise).rejects.toThrow()
   })
 })
