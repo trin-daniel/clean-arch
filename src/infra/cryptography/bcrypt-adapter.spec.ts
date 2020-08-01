@@ -1,9 +1,12 @@
-import bcrypt from 'bcrypt'
+import bcrypt, { compare } from 'bcrypt'
 import { BcryptAdapter } from './bcrypt-adapter'
 
 jest.mock('bcrypt', () => ({
-  hash (): Promise<string> {
+  async hash (): Promise<string> {
     return new Promise(resolve => resolve('hash_final'))
+  },
+  async compare ():Promise<boolean> {
+    return new Promise(resolve => resolve(true))
   }
 }))
 const salt = 12
@@ -12,7 +15,7 @@ const makeSystemUnderTest = ():BcryptAdapter => {
 }
 
 describe('Cryptographic password layer', () => {
-  test('Should call bcrypt with correct value', async () => {
+  test('Should call hash with correct value', async () => {
     const systemUnderTest = makeSystemUnderTest()
     const hashSpy = jest.spyOn(bcrypt, 'hash')
 
@@ -20,7 +23,7 @@ describe('Cryptographic password layer', () => {
     expect(hashSpy).toHaveBeenCalledWith('any_value', salt)
   })
 
-  test('Should return a hash on success', async () => {
+  test('Should return a valid hash on hash success', async () => {
     const systemUnderTest = makeSystemUnderTest()
     const hash = await systemUnderTest.hash('any_value')
     expect(hash).toBe('hash_final')
@@ -32,5 +35,13 @@ describe('Cryptographic password layer', () => {
       .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
     const promise = systemUnderTest.hash('any_value')
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call compare with correct value', async () => {
+    const systemUnderTest = makeSystemUnderTest()
+    const compareSpy = jest.spyOn(bcrypt, 'compare')
+
+    await systemUnderTest.compare('any_value', 'any_hash')
+    expect(compareSpy).toHaveBeenCalledWith('any_value', 'any_hash')
   })
 })
