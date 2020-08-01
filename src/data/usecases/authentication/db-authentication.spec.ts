@@ -1,10 +1,13 @@
-import { AccountModel } from '../../../domain/models/account'
-import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by-email-repository'
 import { DbAuthentication } from './db-authentication'
-import { AuthenticationModel } from '../../../domain/usecases/authentication'
-import { HashComparer } from '../../protocols/cryptography/hash-comparer'
-import { TokenGenerator } from '../../protocols/cryptography/token-generator'
-import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository'
+import
+{
+  AccountModel,
+  LoadAccountByEmailRepository,
+  AuthenticationModel,
+  HashComparer,
+  TokenGenerator,
+  UpdateAccessTokenRepository
+} from './db-authentication-protocols'
 
 const makeFakeAccount = ():AccountModel => ({
   id: 'any_id',
@@ -176,6 +179,7 @@ describe('DbAuthentication usecase', () => {
     const accessToken = await systemUnderTest.auth(makeFakeAuthentication())
     expect(accessToken).toBe('any_token')
   })
+
   test('Should call UpdateAccessTokenRepository with correct values', async () => {
     const {
       systemUnderTest,
