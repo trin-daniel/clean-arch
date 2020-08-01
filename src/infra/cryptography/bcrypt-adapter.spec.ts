@@ -49,4 +49,13 @@ describe('Cryptographic password layer', () => {
     const available = await systemUnderTest.compare('any_value', 'any_hash')
     expect(available).toBe(true)
   })
+  test('Should return false when compare fails', async () => {
+    const systemUnderTest = makeSystemUnderTest()
+    jest.spyOn(bcrypt, 'compare')
+      .mockReturnValueOnce(
+        new Promise(resolve => resolve(false))
+      )
+    const available = await systemUnderTest.compare('any_value', 'any_hash')
+    expect(available).toBe(false)
+  })
 })
