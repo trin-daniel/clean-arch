@@ -16,13 +16,13 @@ describe('Cryptographic password layer', () => {
     const systemUnderTest = makeSystemUnderTest()
     const hashSpy = jest.spyOn(bcrypt, 'hash')
 
-    await systemUnderTest.encrypt('any_value')
+    await systemUnderTest.hash('any_value')
     expect(hashSpy).toHaveBeenCalledWith('any_value', salt)
   })
 
   test('Should return a hash on success', async () => {
     const systemUnderTest = makeSystemUnderTest()
-    const hash = await systemUnderTest.encrypt('any_value')
+    const hash = await systemUnderTest.hash('any_value')
     expect(hash).toBe('hash_final')
   })
 
@@ -30,7 +30,7 @@ describe('Cryptographic password layer', () => {
     const systemUnderTest = makeSystemUnderTest()
     jest.spyOn(bcrypt, 'hash')
       .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
-    const promise = systemUnderTest.encrypt('any_value')
+    const promise = systemUnderTest.hash('any_value')
     await expect(promise).rejects.toThrow()
   })
 })

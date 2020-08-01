@@ -4,18 +4,18 @@ import
   AccountModel,
   AddAccountModel,
   AddAccountRepository,
-  Encrypter
+  Hasher
 } from './db-add-account-protocols'
 
-const makeEncrypter = ():Encrypter => {
-  class EncrypterStub implements Encrypter {
-    encrypt (value:string):Promise<string> {
+const makeHasher = ():Hasher => {
+  class HasherStub implements Hasher {
+    hash (value:string):Promise<string> {
       return new Promise((resolve) => {
         resolve('hashed_password')
       })
     }
   }
-  return new EncrypterStub()
+  return new HasherStub()
 }
 const makeAddAccountRepostory = ():AddAccountRepository => {
   class AddAccountRepositoryStub implements AddAccountRepository {
@@ -27,17 +27,17 @@ const makeAddAccountRepostory = ():AddAccountRepository => {
 }
 interface SystemUnderTestTypes{
   systemUnderTest: DbAddAccount,
-  encrypterStub: Encrypter
+  hasherStub: Hasher
   addAccountRepositoryStub: AddAccountRepository
 }
 
 const makeSystemUnderTest = ():SystemUnderTestTypes => {
-  const encrypterStub = makeEncrypter()
+  const hasherStub = makeHasher()
   const addAccountRepositoryStub = makeAddAccountRepostory()
-  const systemUnderTest = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
+  const systemUnderTest = new DbAddAccount(hasherStub, addAccountRepositoryStub)
   return {
     systemUnderTest,
-    encrypterStub,
+    hasherStub,
     addAccountRepositoryStub
   }
 }
@@ -55,16 +55,16 @@ const makeFakeAccountData = ():AddAccountModel => ({
 })
 
 describe('dbAddAccount usecase', () => {
-  test('Should call encrypter with correct password', async () => {
-    const { encrypterStub, systemUnderTest } = makeSystemUnderTest()
-    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+  test('Should call Hasher with correct password', async () => {
+    const { hasherStub, systemUnderTest } = makeSystemUnderTest()
+    const hashSpy = jest.spyOn(hasherStub, 'hash')
     await systemUnderTest.add(makeFakeAccountData())
-    expect(encryptSpy).toHaveBeenCalledWith('valid_password')
+    expect(hashSpy).toHaveBeenCalledWith('valid_password')
   })
 
-  test('Should throw if Encrypter throws', async () => {
-    const { encrypterStub, systemUnderTest } = makeSystemUnderTest()
-    jest.spyOn(encrypterStub, 'encrypt')
+  test('Should throw if Hasher throws', async () => {
+    const { hasherStub, systemUnderTest } = makeSystemUnderTest()
+    jest.spyOn(hasherStub, 'hash')
       .mockReturnValueOnce(
         new Promise((resolve, reject) => reject(new Error()))
       )
