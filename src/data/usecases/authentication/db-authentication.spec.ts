@@ -55,7 +55,11 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
   const hashComparerStub = makeHashComparer()
   const tokenGeneratorStub = makeTokenGenerator()
-  const systemUnderTest = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub, tokenGeneratorStub)
+  const systemUnderTest = new DbAuthentication(
+    loadAccountByEmailRepositoryStub,
+    hashComparerStub,
+    tokenGeneratorStub
+  )
   return {
     loadAccountByEmailRepositoryStub,
     systemUnderTest,
@@ -139,5 +143,17 @@ describe('DbAuthentication usecase', () => {
     const generateSpy = jest.spyOn(tokenGeneratorStub, 'generate')
     await systemUnderTest.auth(makeFakeAuthentication())
     expect(generateSpy).toHaveBeenCalledWith('any_id')
+  })
+
+  test('Should throw if HashComparer throws', async () => {
+    const {
+      systemUnderTest,
+      tokenGeneratorStub
+    } = makeSystemUnderTest()
+    jest.spyOn(tokenGeneratorStub, 'generate').mockReturnValueOnce(
+      new Promise((resolve, reject) => reject(new Error()))
+    )
+    const promise = systemUnderTest.auth(makeFakeAuthentication())
+    await expect(promise).rejects.toThrow()
   })
 })
