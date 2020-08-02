@@ -1,13 +1,8 @@
 import app from '../config/app'
 import request from 'supertest'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
-declare const process:{
-  env: {
-    MONGO_URL: string
-  }
-}
 
-describe('SignUp Routes', () => {
+describe('Authentication Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -18,15 +13,18 @@ describe('SignUp Routes', () => {
     const accountCollection = await MongoHelper.getCollection('accounts')
     await accountCollection.deleteMany({})
   })
-  test('Should return an account on success', async () => {
-    await request(app)
-      .post('/api/signup')
-      .send({
-        name: 'valid_name',
-        email: 'valid_email@gmail.com',
-        password: 'any_password',
-        confirmation: 'any_password'
-      })
-      .expect(200)
+
+  describe('POST/signup', () => {
+    test('Should return 200 on success', async () => {
+      await request(app)
+        .post('/api/signup')
+        .send({
+          name: 'valid_name',
+          email: 'valid_email@gmail.com',
+          password: 'any_password',
+          confirmation: 'any_password'
+        })
+        .expect(200)
+    })
   })
 })
