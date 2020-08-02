@@ -9,14 +9,14 @@ import
   AddAccount,
   AddAccountModel,
   Validation
-} from './signup-protocols'
+} from './signup-controller-protocols'
 import
 {
   success,
   serverError,
   badRequest
 } from '../../helpers/http/http-helper'
-import { SignUpController } from './signup'
+import { SignUpController } from './signup-controller'
 import { HttpRequest } from '../../protocols'
 
 const makeAddAccount = (): AddAccount => {
