@@ -31,7 +31,7 @@ const makeAuthentication = ():Authentication => {
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const validationStub = makeValidation()
   const authenticationStub = makeAuthentication()
-  const systemUnderTest = new LoginController(validationStub, authenticationStub)
+  const systemUnderTest = new LoginController(authenticationStub, validationStub)
   return {
     systemUnderTest,
     authenticationStub,
