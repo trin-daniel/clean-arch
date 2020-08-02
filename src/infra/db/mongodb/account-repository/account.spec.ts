@@ -47,4 +47,10 @@ describe('Account mongo repository', () => {
     expect(account.email).toBe('any_email@gmail.com')
     expect(account.password).toBe('any_password')
   })
+
+  test('Should return null if loadByEmail fails', async () => {
+    const systemUnderTest = makeSystemUnderTest()
+    const account = await systemUnderTest.loadByEmail('any_email@gmail.com')
+    expect(account).toBeFalsy()
+  })
 })
