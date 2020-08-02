@@ -18,10 +18,7 @@ export class SignUpController implements Controller {
   constructor (
     private readonly addAccount: AddAccount,
     private readonly validation:Validation
-  ) {
-    this.addAccount
-    this.validation
-  }
+  ) {}
 
   async handle (request:HttpRequest): Promise<HttpResponse> {
     try {

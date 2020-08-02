@@ -4,7 +4,7 @@ import { HashComparer } from '../../../data/protocols/cryptography/hash-comparer
 export class BcryptAdapter implements Hasher, HashComparer {
   constructor (
     private readonly salt:number
-  ) { this.salt }
+  ) { }
 
   public async hash (value:string): Promise<string> {
     const hash = await bcrypt.hash(value, this.salt)

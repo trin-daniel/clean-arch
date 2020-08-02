@@ -5,10 +5,7 @@ export class LoginController implements Controller {
   constructor (
     private readonly validation:Validation,
     private readonly authentication: Authentication
-  ) {
-    this.validation
-    this.authentication
-  }
+  ) {}
 
   public async handle (request:HttpRequest): Promise<HttpResponse> {
     try {

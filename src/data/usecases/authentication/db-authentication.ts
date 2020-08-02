@@ -14,12 +14,7 @@ export class DbAuthentication implements Authentication {
     private readonly hashComparer:HashComparer,
     private readonly encrypter: Encrypter,
     private readonly updateAccessTokenRepository:UpdateAccessTokenRepository
-  ) {
-    this.loadAccountByEmailRepository
-    this.hashComparer
-    this.encrypter
-    this.updateAccessTokenRepository
-  }
+  ) {}
 
   public async auth (authentication:AuthenticationModel):Promise<string> {
     const account = await this.loadAccountByEmailRepository.loadByEmail(authentication.email)

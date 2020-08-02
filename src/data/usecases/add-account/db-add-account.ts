@@ -11,10 +11,7 @@ export class DbAddAccount implements AddAccount {
   constructor (
     private readonly hasher: Hasher,
     private readonly addAccountRepository: AddAccountRepository
-  ) {
-    this.hasher
-    this.addAccountRepository
-  }
+  ) {}
 
   public async add (data: AddAccountModel): Promise<AccountModel> {
     const hash = await this.hasher.hash(data.password)

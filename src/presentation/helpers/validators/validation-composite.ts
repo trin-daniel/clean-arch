@@ -3,9 +3,7 @@ import { Validation } from '../../protocols/validation'
 export class ValidationComposite implements Validation {
   constructor (
     private readonly validations: Validation[]
-  ) {
-    this.validations
-  }
+  ) {}
 
   validate (input:any):Error {
     for (const validation of this.validations) {
