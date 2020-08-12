@@ -2,12 +2,13 @@
   "compilerOptions": {
     "target": "ES2019",
     "module": "commonjs",
-    "outDir": "dist",
+    "outDir": "./dist",
     "strict": true,
     "strictNullChecks": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "rootDir": "./src"
   },
   "include": [
     "src"

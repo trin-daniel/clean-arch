@@ -1,13 +1,13 @@
 {
   "name": "clean-node-api",
   "version": "1.2.0",
-  "description": "",
+  "description": "application developed during clean architecture training",
   "scripts": {
     "start": "node dist/main/server.js",
     "build": "rimraf dist && tsc",
     "up": "npm run build && docker-compose up -d",
     "down": "docker-compose down",
-    "debug": "node --inspect=0.0.0.0:9090 --nolazy dist/main/server.js",
+    "debug": "nodemon -L --watch ./dist --inspect=0.0.0.0:9090 --nolazy ./dist/main/server.js",
     "test": "jest --passWithNoTests --runInBand",
     "test:unit": "jest --passWithNoTests --watch --runInBand -c test-unit.js",
     "test:integration": "jest --passWithNoTests --watch --runInBand -c test-integration.js",
@@ -54,6 +54,7 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.0",
+    "nodemon": "^2.0.4",
     "validator": "^13.1.1"
   },
   "engines": {
