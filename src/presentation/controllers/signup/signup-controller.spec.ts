@@ -1,7 +1,8 @@
 import
 {
   MissingParamError,
-  ServerError
+  ServerError,
+  EmailInUseError
 } from '../../errors'
 import
 {
@@ -16,7 +17,8 @@ import
 {
   success,
   serverError,
-  badRequest
+  badRequest,
+  forbidden
 } from '../../helpers/http/http-helper'
 import { SignUpController } from './signup-controller'
 import { HttpRequest } from '../../protocols'
@@ -106,6 +108,15 @@ describe('component signUp controller', () => {
       email: 'any_email@gmail.com',
       password: 'any_password'
     })
+  })
+  test('Should return 403 if AddAccount returns null', async () => {
+    const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
+    jest.spyOn(addAccountStub, 'add')
+      .mockReturnValueOnce(
+        new Promise(resolve => resolve(null))
+      )
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(forbidden(new EmailInUseError()))
   })
 
   test('Should return 200 if valid data is provided', async () => {
