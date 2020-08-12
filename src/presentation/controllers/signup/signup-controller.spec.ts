@@ -8,7 +8,9 @@ import
   AccountModel,
   AddAccount,
   AddAccountModel,
-  Validation
+  Validation,
+  Authentication,
+  AuthenticationModel
 } from './signup-controller-protocols'
 import
 {
@@ -37,19 +39,31 @@ const makeValidation = (): Validation => {
   return new ValidationStub()
 }
 
+const makeAuthentication = ():Authentication => {
+  class AuthenticationStub implements Authentication {
+    async auth (authentication: AuthenticationModel):Promise<string> {
+      return new Promise(resolve => resolve('any_token'))
+    }
+  }
+  return new AuthenticationStub()
+}
+
 interface SystemUnderTestTypes{
   systemUnderTest: SignUpController,
   addAccountStub: AddAccount,
   validationStub: Validation
+  authenticationStub: Authentication
 }
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const addAccountStub = makeAddAccount()
   const validationStub = makeValidation()
-  const systemUnderTest = new SignUpController(addAccountStub, validationStub)
+  const authenticationStub = makeAuthentication()
+  const systemUnderTest = new SignUpController(addAccountStub, validationStub, authenticationStub)
   return {
     systemUnderTest,
     addAccountStub,
-    validationStub
+    validationStub,
+    authenticationStub
   }
 }
 
@@ -118,5 +132,14 @@ describe('component signUp controller', () => {
     expect(response).toEqual(
       badRequest(new MissingParamError('any_field'))
     )
+  })
+  test('Should call Authentication with correct values', async () => {
+    const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
+    const authSpy = jest.spyOn(authenticationStub, 'auth')
+      .mockImplementationOnce(() => {
+        throw new Error()
+      })
+    await systemUnderTest.handle(makeFakeRequest())
+    expect(authSpy).toHaveBeenCalledWith({ email: 'any_email@gmail.com', password: 'any_password' })
   })
 })
