@@ -37,7 +37,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "git-commit-msg-linter": "^2.4.4",
     "husky": "^4.2.5",
-    "jest": "^26.3.0",
+    "jest": "^26.4.0",
     "lint-staged": "^10.2.11",
     "rimraf": "^3.0.2",
     "supertest": "^4.0.2",

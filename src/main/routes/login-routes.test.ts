@@ -4,7 +4,7 @@ import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import { Collection } from 'mongodb'
 import { hash } from 'bcrypt'
 
-let accountCollection:Collection
+let accountCollection: Collection
 
 describe('Authentication Routes', () => {
   beforeAll(async () => {
@@ -25,8 +25,8 @@ describe('Authentication Routes', () => {
         .send({
           name: 'valid_name',
           email: 'valid_email@gmail.com',
-          password: 'any_password',
-          confirmation: 'any_password'
+          password: 'valid_password',
+          confirmation: 'valid_password'
         })
         .expect(200)
     })

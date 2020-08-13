@@ -1,5 +1,5 @@
 import { CompareFieldsValidation } from './compare-fields-validation'
-import { InvalidParamErrors } from '../../errors'
+import { InvalidParamErrors } from '../../presentation/errors'
 
 const makeSystemUnderTest = ():CompareFieldsValidation => {
   return new CompareFieldsValidation('field', 'fieldToCompare')
