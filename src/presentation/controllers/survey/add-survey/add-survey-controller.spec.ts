@@ -1,6 +1,7 @@
 import { HttpRequest } from './add-survey-controller-protocols'
 import { AddSurveyController } from './add-survey-controller'
 import { Validation } from '../../../protocols'
+import { badRequest } from '../../../helpers/http/http-helper'
 
 interface SystemUnderTestTypes {
   systemUnderTest: AddSurveyController
@@ -43,5 +44,12 @@ describe('AddSurvey Controller', () => {
 
     await systemUnderTest.handle(request)
     expect(validateSpy).toHaveBeenCalledWith(request.body)
+  })
+
+  test('Should return 400 if Validation fails', async () => {
+    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new Error())
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(badRequest(new Error()))
   })
 })
