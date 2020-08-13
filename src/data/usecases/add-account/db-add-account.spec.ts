@@ -4,6 +4,7 @@ import
   AccountModel,
   AddAccountModel,
   AddAccountRepository,
+  LoadAccountByEmailRepository,
   Hasher
 } from './db-add-account-protocols'
 
@@ -25,20 +26,32 @@ const makeAddAccountRepostory = ():AddAccountRepository => {
   }
   return new AddAccountRepositoryStub()
 }
+
+const makeLoadAccountByEmailRepository = ():LoadAccountByEmailRepository => {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    public async loadByEmail (email:string):Promise<AccountModel> {
+      return new Promise(resolve => resolve(makeFakeAccount()))
+    }
+  }
+  return new LoadAccountByEmailRepositoryStub()
+}
 interface SystemUnderTestTypes{
   systemUnderTest: DbAddAccount,
   hasherStub: Hasher
   addAccountRepositoryStub: AddAccountRepository
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
 }
 
 const makeSystemUnderTest = ():SystemUnderTestTypes => {
   const hasherStub = makeHasher()
   const addAccountRepositoryStub = makeAddAccountRepostory()
-  const systemUnderTest = new DbAddAccount(hasherStub, addAccountRepositoryStub)
+  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
+  const systemUnderTest = new DbAddAccount(hasherStub, addAccountRepositoryStub, loadAccountByEmailRepositoryStub)
   return {
     systemUnderTest,
     hasherStub,
-    addAccountRepositoryStub
+    addAccountRepositoryStub,
+    loadAccountByEmailRepositoryStub
   }
 }
 const makeFakeAccount = ():AccountModel => ({
@@ -96,5 +109,15 @@ describe('dbAddAccount usecase', () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const accountReturned = await systemUnderTest.add(makeFakeAccountData())
     expect(accountReturned).toEqual(makeFakeAccount())
+  })
+
+  test('Should call LoadAccountByEmailRepository with correct  email', async () => {
+    const {
+      systemUnderTest,
+      loadAccountByEmailRepositoryStub
+    } = makeSystemUnderTest()
+    const loadSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
+    await systemUnderTest.add(makeFakeAccountData())
+    expect(loadSpy).toHaveBeenCalledWith('valid_email@gmail.com')
   })
 })
