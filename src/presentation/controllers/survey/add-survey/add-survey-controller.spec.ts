@@ -1,6 +1,6 @@
 import { HttpRequest, AddSurvey, AddSurveyModel, Validation } from './add-survey-controller-protocols'
 import { AddSurveyController } from './add-survey-controller'
-import { badRequest } from '../../../helpers/http/http-helper'
+import { badRequest, serverError } from '../../../helpers/http/http-helper'
 
 interface SystemUnderTestTypes {
   systemUnderTest: AddSurveyController
@@ -72,5 +72,16 @@ describe('AddSurvey Controller', () => {
 
     await systemUnderTest.handle(request)
     expect(addSpy).toHaveBeenCalledWith(request.body)
+  })
+
+  test('Should returns 500 if AddSurvey throws', async () => {
+    const { systemUnderTest, addSurveyStub } = makeSystemUnderTest()
+    jest.spyOn(addSurveyStub, 'add')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
+
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(serverError(new Error()))
   })
 })
