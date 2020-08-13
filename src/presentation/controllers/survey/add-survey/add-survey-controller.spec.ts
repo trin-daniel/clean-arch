@@ -1,6 +1,30 @@
-import { HttpRequest, HttpResponse, Controller } from './add-survey-controller-protocols'
+import { HttpRequest } from './add-survey-controller-protocols'
 import { AddSurveyController } from './add-survey-controller'
 import { Validation } from '../../../protocols'
+
+interface SystemUnderTestTypes {
+  systemUnderTest: AddSurveyController
+  validationStub: Validation
+}
+
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
+    validate (input: any):Error {
+      return null
+    }
+  }
+  return new ValidationStub()
+}
+
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
+  const validationStub = makeValidation()
+  const systemUnderTest = new AddSurveyController(validationStub)
+  return {
+    systemUnderTest,
+    validationStub
+  }
+}
+
 const makeFakeRequest = ():HttpRequest => ({
   body: {
     question: 'any_question',
@@ -13,14 +37,8 @@ const makeFakeRequest = ():HttpRequest => ({
 
 describe('AddSurvey Controller', () => {
   test('Should call Validation with correct values', async () => {
-    class ValidationStub implements Validation {
-      validate (input: any):Error {
-        return null
-      }
-    }
-    const validationStub = new ValidationStub()
+    const { systemUnderTest, validationStub } = makeSystemUnderTest()
     const validateSpy = jest.spyOn(validationStub, 'validate')
-    const systemUnderTest = new AddSurveyController(validationStub)
     const request = makeFakeRequest()
 
     await systemUnderTest.handle(request)
