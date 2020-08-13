@@ -1,6 +1,6 @@
 import { HttpRequest, AddSurvey, AddSurveyModel, Validation } from './add-survey-controller-protocols'
 import { AddSurveyController } from './add-survey-controller'
-import { badRequest, serverError } from '../../../helpers/http/http-helper'
+import { badRequest, serverError, noContent } from '../../../helpers/http/http-helper'
 
 interface SystemUnderTestTypes {
   systemUnderTest: AddSurveyController
@@ -83,5 +83,12 @@ describe('AddSurvey Controller', () => {
 
     const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should returns 204 on success', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const request = makeFakeRequest()
+    const response = await systemUnderTest.handle(request)
+    expect(response).toEqual(noContent())
   })
 })
