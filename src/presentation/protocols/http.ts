@@ -1,7 +1,8 @@
 export interface HttpRequest{
-  body: {
+  body?: {
     [key: string]:any,
-  };
+  }
+  headers?:any
 }
 
 export interface HttpResponse{
