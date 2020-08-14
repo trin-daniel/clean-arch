@@ -4,6 +4,29 @@ import { AuthMiddleware } from './auth-middleware'
 import { LoadAccountByToken } from '../../domain/usecases/load-account-by-token'
 import { AccountModel } from '../../domain/models/account'
 
+interface SystemUnderTestTypes{
+  systemUnderTest: AuthMiddleware
+  loadAccountByTokenStub: LoadAccountByToken
+}
+
+const makeLoadAccountByToken = (): LoadAccountByToken => {
+  class LoadAccountByTokenStub implements LoadAccountByToken {
+    public async load (token:string, role?:string):Promise<AccountModel> {
+      return new Promise(resolve => resolve(makeFakeAccount()))
+    }
+  }
+  return new LoadAccountByTokenStub()
+}
+
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
+  const loadAccountByTokenStub = makeLoadAccountByToken()
+  const systemUnderTest = new AuthMiddleware(loadAccountByTokenStub)
+  return {
+    systemUnderTest,
+    loadAccountByTokenStub
+  }
+}
+
 const makeFakeAccount = ():AccountModel => ({
   id: 'valid_id',
   name: 'valid_name',
@@ -13,27 +36,13 @@ const makeFakeAccount = ():AccountModel => ({
 
 describe('Auth middleware', () => {
   test('Should return 403 if no x-access-token exists in headers', async () => {
-    class LoadAccountByTokenStub implements LoadAccountByToken {
-      public async load (token:string, role?:string):Promise<AccountModel> {
-        return new Promise(resolve => resolve(makeFakeAccount()))
-      }
-    }
-
-    const loadAccountByTokenStub = new LoadAccountByTokenStub()
-    const systemUnderTest = new AuthMiddleware(loadAccountByTokenStub)
+    const { systemUnderTest } = makeSystemUnderTest()
     const response = await systemUnderTest.handle({})
     expect(response).toEqual(forbidden(new AccessDeniedError()))
   })
 
   test('Should call loadAccountByToken with correct accessToken', async () => {
-    class LoadAccountByTokenStub implements LoadAccountByToken {
-      public async load (token:string, role?:string):Promise<AccountModel> {
-        return new Promise(resolve => resolve(makeFakeAccount()))
-      }
-    }
-
-    const loadAccountByTokenStub = new LoadAccountByTokenStub()
-    const systemUnderTest = new AuthMiddleware(loadAccountByTokenStub)
+    const { systemUnderTest, loadAccountByTokenStub } = makeSystemUnderTest()
     const loadSpy = jest.spyOn(loadAccountByTokenStub, 'load')
     await systemUnderTest.handle({
       headers: {
