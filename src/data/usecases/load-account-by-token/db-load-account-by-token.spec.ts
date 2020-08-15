@@ -92,4 +92,10 @@ describe('DbLoadAccountByToken', () => {
     const account = await systemUnderTest.load('any_token', 'any_role')
     expect(account).toBeNull()
   })
+
+  test('Should return an account on success', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const account = await systemUnderTest.load('any_token', 'any_role')
+    expect(account).toEqual(makeFakeAccount())
+  })
 })
