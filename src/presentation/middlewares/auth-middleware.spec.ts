@@ -1,9 +1,17 @@
-import { forbidden, success, serverError } from '../helpers/http/http-helper'
+import {
+  AccountModel,
+  HttpRequest,
+  LoadAccountByToken
+} from './auth-middleware-protocols'
+
+import {
+  forbidden,
+  success,
+  serverError
+} from '../helpers/http/http-helper'
+
 import { AccessDeniedError } from '../errors'
 import { AuthMiddleware } from './auth-middleware'
-import { LoadAccountByToken } from '../../domain/usecases/load-account-by-token'
-import { AccountModel } from '../../domain/models/account'
-import { HttpRequest } from '../protocols'
 
 interface SystemUnderTestTypes{
   systemUnderTest: AuthMiddleware
@@ -39,7 +47,7 @@ const makeFakeRequest = (): HttpRequest => ({
   headers: { 'x-access-token': 'any_token' }
 })
 
-describe('Auth middleware', () => {
+describe('Auth Middleware', () => {
   test('Should return 403 if no x-access-token exists in headers', async () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const response = await systemUnderTest.handle({})
