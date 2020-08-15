@@ -1,4 +1,4 @@
-import { forbidden } from '../helpers/http/http-helper'
+import { forbidden, success } from '../helpers/http/http-helper'
 import { AccessDeniedError } from '../errors'
 import { AuthMiddleware } from './auth-middleware'
 import { LoadAccountByToken } from '../../domain/usecases/load-account-by-token'
@@ -59,7 +59,13 @@ describe('Auth middleware', () => {
       .mockReturnValueOnce(
         new Promise(resolve => resolve(null))
       )
-    const response = await systemUnderTest.handle({})
+    const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(forbidden(new AccessDeniedError()))
+  })
+
+  test('Should return 200 if LoadAccountByToken returns an account', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(success({ account_id: 'valid_id' }))
   })
 })
