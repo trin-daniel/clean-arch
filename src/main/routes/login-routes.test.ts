@@ -32,7 +32,7 @@ describe('Authentication Routes', () => {
     })
   })
 
-  describe('POST/login', () => {
+  describe('POST/signin', () => {
     test('Should return 200 on login', async () => {
       const password = await hash('123', 12)
       await accountCollection.insertOne({
@@ -41,7 +41,7 @@ describe('Authentication Routes', () => {
         password
       })
       await request(app)
-        .post('/api/login')
+        .post('/api/signin')
         .send({
           email: 'valid_email@gmail.com',
           password: '123'
@@ -50,7 +50,7 @@ describe('Authentication Routes', () => {
     })
     test('Should return 401 on login', async () => {
       await request(app)
-        .post('/api/login')
+        .post('/api/signin')
         .send({
           email: 'valid_email@gmail.com',
           password: '123'
