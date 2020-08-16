@@ -10,7 +10,7 @@ import
   Response
 } from 'express'
 
-export const adaptRoute = (controller: Controller) => {
+export const ExpressRouteAdapter = (controller: Controller) => {
   return async (req:Request, res: Response) => {
     const httpRequest:HttpRequest = {
       body: req.body
@@ -19,7 +19,7 @@ export const adaptRoute = (controller: Controller) => {
     if (httpResponse.statusCode >= 200 || httpResponse.statusCode <= 299) {
       res.status(httpResponse.statusCode).json(httpResponse.body)
     } else {
-      res.status(httpResponse.statusCode).json({ Error: httpResponse.body?.message })
+      res.status(httpResponse.statusCode).json({ Error: httpResponse.body.message })
     }
   }
 }
