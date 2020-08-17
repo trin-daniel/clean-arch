@@ -1,6 +1,7 @@
 import { LoadSurveysRepository } from '../../protocols/db/survey/load-surveys-repository'
 import { SurveyModel } from '../../../domain/models/survey'
 import { DbLoadSurveys } from './db-load-surveys'
+import { set, reset } from 'mockdate'
 
 interface SystemUnderTestTypes {
   systemUnderTest: DbLoadSurveys,
@@ -46,11 +47,25 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
 }
 
 describe('DbLoadSurveys', () => {
+  beforeAll(() => {
+    set(new Date())
+  })
+
+  afterAll(() => {
+    reset()
+  })
+
   test('Should call LoadSuverysRepository', async () => {
     const { systemUnderTest, loadSurveysRepositoryStub } = makeSystemUnderTest()
     const loadAllSpy = jest.spyOn(loadSurveysRepositoryStub, 'loadAll')
 
     await systemUnderTest.load()
     expect(loadAllSpy).toHaveBeenCalled()
+  })
+
+  test('Should return list of surveys on success', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const surveys = await systemUnderTest.load()
+    expect(surveys).toEqual(makeFakeSurveys())
   })
 })
