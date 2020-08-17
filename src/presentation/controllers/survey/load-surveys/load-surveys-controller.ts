@@ -1,5 +1,10 @@
-import { Controller, HttpResponse, HttpRequest, LoadSurveys } from './load-surveys-controller-protocols'
-import { success } from '../../../helpers/http/http-helper'
+import {
+  Controller,
+  HttpResponse,
+  HttpRequest,
+  LoadSurveys
+} from './load-surveys-controller-protocols'
+import { success, serverError } from '../../../helpers/http/http-helper'
 
 export class LoadSurveysController implements Controller {
   constructor (
@@ -7,7 +12,11 @@ export class LoadSurveysController implements Controller {
   ) {}
 
   public async handle (request: HttpRequest):Promise<HttpResponse> {
-    const surveys = await this.loadSurveys.load()
-    return success(surveys)
+    try {
+      const surveys = await this.loadSurveys.load()
+      return success(surveys)
+    } catch (err) {
+      return serverError(err)
+    }
   }
 }
