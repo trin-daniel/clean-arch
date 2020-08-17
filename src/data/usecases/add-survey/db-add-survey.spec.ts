@@ -1,5 +1,6 @@
 import { DbAddSurvey } from './db-add-survey'
 import { AddSurveyModel, AddSurveyRepository } from './db-add-survey-protocols'
+import { set, reset } from 'mockdate'
 
 interface SystemUnderTestTypes{
   systemUnderTest: DbAddSurvey
@@ -28,10 +29,19 @@ const makeFakeSurveyData = (): AddSurveyModel => ({
   answers: [{
     image: 'any_image',
     answer: 'any_answer'
-  }]
+  }],
+  date: new Date()
 })
 
 describe('DbAddSurvey usecase', () => {
+  beforeAll(() => {
+    set(new Date())
+  })
+
+  afterAll(() => {
+    reset()
+  })
+
   test('Should call AddSurveyRepository with correct values', async () => {
     const { systemUnderTest, addSurveyRepositoryStub } = makeSystemUnderTest()
     const addSpy = jest.spyOn(addSurveyRepositoryStub, 'add')

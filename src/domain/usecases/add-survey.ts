@@ -2,8 +2,9 @@ export interface AddSurveyModel{
   question: string
   answers: Array<{
     image?: string,
-    answer: string
+    answer: string,
   }>
+  date: Date,
 }
 
 export interface AddSurvey{
