@@ -2,7 +2,6 @@ import { LoadSurveysRepository } from '../../protocols/db/survey/load-surveys-re
 import { SurveyModel } from '../../../domain/models/survey'
 import { DbLoadSurveys } from './db-load-surveys'
 import { set, reset } from 'mockdate'
-import { resolve } from 'path'
 
 interface SystemUnderTestTypes {
   systemUnderTest: DbLoadSurveys,
