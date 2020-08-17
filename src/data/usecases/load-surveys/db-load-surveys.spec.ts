@@ -1,6 +1,12 @@
 import { LoadSurveysRepository } from '../../protocols/db/survey/load-surveys-repository'
 import { SurveyModel } from '../../../domain/models/survey'
 import { DbLoadSurveys } from './db-load-surveys'
+
+interface SystemUnderTestTypes {
+  systemUnderTest: DbLoadSurveys,
+  loadSurveysRepositoryStub: LoadSurveysRepository
+}
+
 const makeFakeSurveys = (): SurveyModel[] => {
   return [{
     id: 'any_id',
@@ -21,15 +27,27 @@ const makeFakeSurveys = (): SurveyModel[] => {
   }]
 }
 
+const makeLoadSurveysRepository = () : LoadSurveysRepository => {
+  class LoadSurveysRepositoryStub implements LoadSurveysRepository {
+    public async loadAll ():Promise<SurveyModel[]> {
+      return new Promise(resolve => resolve(makeFakeSurveys()))
+    }
+  }
+  return new LoadSurveysRepositoryStub()
+}
+
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
+  const loadSurveysRepositoryStub = makeLoadSurveysRepository()
+  const systemUnderTest = new DbLoadSurveys(loadSurveysRepositoryStub)
+  return {
+    systemUnderTest,
+    loadSurveysRepositoryStub
+  }
+}
+
 describe('DbLoadSurveys', () => {
   test('Should call LoadSuverysRepository', async () => {
-    class LoadSurveysRepositoryStub implements LoadSurveysRepository {
-      public async loadAll ():Promise<SurveyModel[]> {
-        return new Promise(resolve => resolve(makeFakeSurveys()))
-      }
-    }
-    const loadSurveysRepositoryStub = new LoadSurveysRepositoryStub()
-    const systemUnderTest = new DbLoadSurveys(loadSurveysRepositoryStub)
+    const { systemUnderTest, loadSurveysRepositoryStub } = makeSystemUnderTest()
     const loadAllSpy = jest.spyOn(loadSurveysRepositoryStub, 'loadAll')
 
     await systemUnderTest.load()
