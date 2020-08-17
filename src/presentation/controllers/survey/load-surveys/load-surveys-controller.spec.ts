@@ -1,5 +1,6 @@
 import { LoadSurveysController } from './load-surveys-controller'
 import { SurveyModel, LoadSurveys } from './load-surveys-controller-protocols'
+import { success, serverError } from '../../../helpers/http/http-helper'
 import { set, reset } from 'mockdate'
 
 interface SystemUnderTestTypes {
@@ -60,5 +61,23 @@ describe('LoadSurveys controller', () => {
 
     await systemUnderTest.handle({})
     expect(loadSpy).toHaveBeenCalled()
+  })
+
+  test('Should return 200 on success', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const response = await systemUnderTest.handle({})
+
+    expect(response).toEqual(success(makeFakeSurveys()))
+  })
+
+  test('Should return 500 if LoadSurvey throws', async () => {
+    const { systemUnderTest, loadSurveysStub } = makeSystemUnderTest()
+    jest.spyOn(loadSurveysStub, 'load')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
+    const response = await systemUnderTest.handle({})
+
+    expect(response).toEqual(serverError(new Error()))
   })
 })
