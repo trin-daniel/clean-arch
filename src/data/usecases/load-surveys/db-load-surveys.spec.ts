@@ -2,6 +2,7 @@ import { LoadSurveysRepository } from '../../protocols/db/survey/load-surveys-re
 import { SurveyModel } from '../../../domain/models/survey'
 import { DbLoadSurveys } from './db-load-surveys'
 import { set, reset } from 'mockdate'
+import { resolve } from 'path'
 
 interface SystemUnderTestTypes {
   systemUnderTest: DbLoadSurveys,
@@ -67,5 +68,15 @@ describe('DbLoadSurveys', () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const surveys = await systemUnderTest.load()
     expect(surveys).toEqual(makeFakeSurveys())
+  })
+
+  test('Should throw if LoadSurveysRepository throws', async () => {
+    const { systemUnderTest, loadSurveysRepositoryStub } = makeSystemUnderTest()
+    jest.spyOn(loadSurveysRepositoryStub, 'loadAll')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
+    const promise = systemUnderTest.load()
+    await expect(promise).rejects.toThrow()
   })
 })
