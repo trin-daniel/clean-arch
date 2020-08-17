@@ -2,6 +2,29 @@ import { LoadSurveysController } from './load-surveys-controller'
 import { SurveyModel, LoadSurveys } from './load-surveys-controller-protocols'
 import { set, reset } from 'mockdate'
 
+interface SystemUnderTestTypes {
+  systemUnderTest: LoadSurveysController
+  loadSurveysStub: LoadSurveys
+}
+
+const makeLoadSurveys = (): LoadSurveys => {
+  class LoadSurveysStub implements LoadSurveys {
+    public async load ():Promise<SurveyModel[]> {
+      return new Promise(resolve => resolve(makeFakeSurveys()))
+    }
+  }
+  return new LoadSurveysStub()
+}
+
+const makeSystemUnderTest = ():SystemUnderTestTypes => {
+  const loadSurveysStub = makeLoadSurveys()
+  const systemUnderTest = new LoadSurveysController(loadSurveysStub)
+  return {
+    systemUnderTest,
+    loadSurveysStub
+  }
+}
+
 const makeFakeSurveys = (): SurveyModel[] => {
   return [{
     id: 'any_id',
@@ -32,14 +55,8 @@ describe('LoadSurveys controller', () => {
   })
 
   test('Should call LoadSurveys', async () => {
-    class LoadSurveysStub implements LoadSurveys {
-      public async load ():Promise<SurveyModel[]> {
-        return new Promise(resolve => resolve(makeFakeSurveys()))
-      }
-    }
-    const loadSurveysStub = new LoadSurveysStub()
+    const { systemUnderTest, loadSurveysStub } = makeSystemUnderTest()
     const loadSpy = jest.spyOn(loadSurveysStub, 'load')
-    const systemUnderTest = new LoadSurveysController(loadSurveysStub)
 
     await systemUnderTest.handle({})
     expect(loadSpy).toHaveBeenCalled()
