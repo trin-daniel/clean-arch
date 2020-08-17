@@ -8,6 +8,25 @@ import { env } from '../config/env'
 let surveys: Collection
 let accounts:Collection
 
+const makeAccessToken = async ():Promise<string> => {
+  const account = await accounts.insertOne({
+    name: 'valid_name',
+    email: 'valid_email@gmail.com',
+    password: 'valid_password',
+    role: 'admin'
+  })
+  const id = account.ops[0]._id
+  const accessToken = sign({ id }, env.secret)
+  await accounts.updateOne({
+    _id: id
+  }, {
+    $set: {
+      accessToken
+    }
+  })
+  return accessToken
+}
+
 describe('AddSurvey Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
@@ -37,21 +56,7 @@ describe('AddSurvey Routes', () => {
     })
 
     test('Should return 204 on add survey with valid accessToken', async () => {
-      const account = await accounts.insertOne({
-        name: 'valid_name',
-        email: 'valid_email@gmail.com',
-        password: 'valid_password',
-        role: 'admin'
-      })
-      const id = account.ops[0]._id
-      const accessToken = sign({ id }, env.secret)
-      await accounts.updateOne({
-        _id: id
-      }, {
-        $set: {
-          accessToken
-        }
-      })
+      const accessToken = await makeAccessToken()
       await request(app)
         .post('/api/surveys')
         .set('x-access-token', accessToken)
@@ -60,7 +65,8 @@ describe('AddSurvey Routes', () => {
           answers: [{
             answer: 'any_answer',
             image: 'https://images.com.br/profile?image=1'
-          }]
+          }],
+          date: new Date()
         })
         .expect(204)
     })
@@ -71,33 +77,13 @@ describe('AddSurvey Routes', () => {
       await request(app).get('/api/surveys').expect(403)
     })
 
-    test('Should return 200 on load surveys with valid accessToken', async () => {
-      const account = await accounts.insertOne({
-        name: 'valid_name',
-        email: 'valid_email@gmail.com',
-        password: 'valid_password'
-      })
-      const id = account.ops[0]._id
-      const accessToken = sign({ id }, env.secret)
-      await accounts.updateOne({
-        _id: id
-      }, {
-        $set: {
-          accessToken
-        }
-      })
-      await surveys.insertOne({
-        question: 'any_question',
-        answers: [{
-          answer: 'any_answer',
-          image: 'any_image'
-        }],
-        date: new Date()
-      })
+    test('Should return 204 on load surveys with valid accessToken', async () => {
+      const accessToken = await makeAccessToken()
+
       await request(app)
         .get('/api/surveys')
         .set('x-access-token', accessToken)
-        .expect(200)
+        .expect(204)
     })
   })
 })
