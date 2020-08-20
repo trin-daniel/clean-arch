@@ -1,11 +1,12 @@
-import { DbAddSurvey } from './db-add-survey'
-import { AddSurveyModel, AddSurveyRepository } from './db-add-survey-protocols'
 import { set, reset } from 'mockdate'
+import { AddSurveyModel, AddSurveyRepository } from './db-add-survey-protocols'
+import { DbAddSurvey } from './db-add-survey'
 
-interface SystemUnderTestTypes{
+type SystemUnderTestTypes = {
   systemUnderTest: DbAddSurvey
   addSurveyRepositoryStub: AddSurveyRepository
 }
+
 const makeAddSurveyRepository = (): AddSurveyRepository => {
   class AddSurveyRepositoryStub implements AddSurveyRepository {
     public async add (surveyData: AddSurveyModel):Promise<void> {

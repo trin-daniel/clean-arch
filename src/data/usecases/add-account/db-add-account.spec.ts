@@ -1,12 +1,19 @@
-import { DbAddAccount } from '../add-account/db-add-account'
-import
-{
+import {
   AccountModel,
   AddAccountModel,
   AddAccountRepository,
   LoadAccountByEmailRepository,
   Hasher
 } from './db-add-account-protocols'
+
+import { DbAddAccount } from '../add-account/db-add-account'
+
+type SystemUnderTestTypes = {
+  systemUnderTest: DbAddAccount,
+  hasherStub: Hasher
+  addAccountRepositoryStub: AddAccountRepository
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+}
 
 const makeHasher = ():Hasher => {
   class HasherStub implements Hasher {
@@ -18,6 +25,7 @@ const makeHasher = ():Hasher => {
   }
   return new HasherStub()
 }
+
 const makeAddAccountRepostory = ():AddAccountRepository => {
   class AddAccountRepositoryStub implements AddAccountRepository {
     public async add (account: AddAccountModel): Promise<AccountModel> {
@@ -35,12 +43,6 @@ const makeLoadAccountByEmailRepository = ():LoadAccountByEmailRepository => {
   }
   return new LoadAccountByEmailRepositoryStub()
 }
-interface SystemUnderTestTypes{
-  systemUnderTest: DbAddAccount,
-  hasherStub: Hasher
-  addAccountRepositoryStub: AddAccountRepository
-  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
-}
 
 const makeSystemUnderTest = ():SystemUnderTestTypes => {
   const hasherStub = makeHasher()
@@ -54,6 +56,7 @@ const makeSystemUnderTest = ():SystemUnderTestTypes => {
     loadAccountByEmailRepositoryStub
   }
 }
+
 const makeFakeAccount = ():AccountModel => ({
   id: 'valid_id',
   name: 'valid_name',
@@ -95,6 +98,7 @@ describe('dbAddAccount usecase', () => {
       password: 'hashed_password'
     })
   })
+
   test('Should throw if AddAccountRepository throws', async () => {
     const { addAccountRepositoryStub, systemUnderTest } = makeSystemUnderTest()
     jest.spyOn(addAccountRepositoryStub, 'add')

@@ -2,6 +2,11 @@ import { EmailValidator } from '../protocols/email-validator'
 import { EmailValidation } from './email-validation'
 import { InvalidParamErrors } from '../../presentation/errors'
 
+type SystemUnderTestTypes = {
+  systemUnderTest: EmailValidation,
+  emailValidatorStub: EmailValidator,
+}
+
 const makeEmailValidator = ():EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email:string):boolean {
@@ -11,10 +16,6 @@ const makeEmailValidator = ():EmailValidator => {
   return new EmailValidatorStub()
 }
 
-interface SystemUnderTestTypes{
-  systemUnderTest: EmailValidation,
-  emailValidatorStub: EmailValidator,
-}
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const emailValidatorStub = makeEmailValidator()
   const systemUnderTest = new EmailValidation('email', emailValidatorStub)

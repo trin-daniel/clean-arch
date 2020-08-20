@@ -13,7 +13,7 @@ import {
 import { AccessDeniedError } from '../errors'
 import { AuthMiddleware } from './auth-middleware'
 
-interface SystemUnderTestTypes{
+type SystemUnderTestTypes = {
   systemUnderTest: AuthMiddleware
   loadAccountByTokenStub: LoadAccountByToken
 }

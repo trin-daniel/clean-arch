@@ -4,7 +4,7 @@ import { MissingParamError } from '../../../errors'
 import { HttpRequest, Authentication, Validation } from './login-controller-protocols'
 import { AuthenticationModel } from '../../../../domain/usecases/authentication'
 
-interface SystemUnderTestTypes{
+type SystemUnderTestTypes = {
   systemUnderTest: LoginController
   authenticationStub: Authentication
   validationStub: Validation

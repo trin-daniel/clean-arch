@@ -3,7 +3,7 @@ import { SurveyModel, LoadSurveys } from './load-surveys-controller-protocols'
 import { success, serverError, noContent } from '../../../helpers/http/http-helper'
 import { set, reset } from 'mockdate'
 
-interface SystemUnderTestTypes {
+type SystemUnderTestTypes = {
   systemUnderTest: LoadSurveysController
   loadSurveysStub: LoadSurveys
 }
