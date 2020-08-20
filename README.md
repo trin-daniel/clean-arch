@@ -1,2 +1,0 @@
-[![Build Status](https://travis-ci.com/trin-daniel/clean-architecture-api.svg?branch=master)](https://travis-ci.com/trin-daniel/clean-architecture-api)
-[![Coverage Status](https://coveralls.io/repos/github/trin-daniel/clean-architecture-api/badge.svg?branch=master)](https://coveralls.io/github/trin-daniel/clean-architecture-api?branch=master)
