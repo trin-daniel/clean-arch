@@ -12,7 +12,8 @@
     "test:unit": "jest --passWithNoTests --watch --runInBand -c test-unit.js",
     "test:integration": "jest --passWithNoTests --watch --runInBand -c test-integration.js",
     "test:staged": "jest --passWithNoTests --runInBand --findRelatedTests",
-    "test:ci": "jest --passWithNoTests --runInBand --coverage"
+    "test:ci": "jest --passWithNoTests --runInBand --coverage",
+    "test:coveralls": "npm run test:ci && coveralls < coverage/lcov.info"
   },
   "keywords": [],
   "author": "",
