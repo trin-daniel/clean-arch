@@ -3,7 +3,7 @@ import { AddSurveyController } from './add-survey-controller'
 import { badRequest, serverError, noContent } from '../../../helpers/http/http-helper'
 import { set, reset } from 'mockdate'
 
-interface SystemUnderTestTypes {
+type SystemUnderTestTypes = {
   systemUnderTest: AddSurveyController
   validationStub: Validation,
   addSurveyStub: AddSurvey
@@ -58,6 +58,7 @@ describe('AddSurvey Controller', () => {
   afterAll(() => {
     reset()
   })
+
   test('Should call Validation with correct values', async () => {
     const { systemUnderTest, validationStub } = makeSystemUnderTest()
     const validateSpy = jest.spyOn(validationStub, 'validate')

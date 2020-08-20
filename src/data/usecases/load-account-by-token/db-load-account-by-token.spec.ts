@@ -3,7 +3,7 @@ import { DbLoadAccountByToken } from './db-load-account-by-token'
 import { AccountModel } from '../../../domain/models/account'
 import { LoadAccountByTokenRepository } from '../../protocols/db/account/load-account-by-token-repository'
 
-interface SystemUnderTestTypes{
+type SystemUnderTestTypes = {
   systemUnderTest: DbLoadAccountByToken,
   decrypterStub: Decrypter
   loadAccountByTokenRepositoryStub: LoadAccountByTokenRepository

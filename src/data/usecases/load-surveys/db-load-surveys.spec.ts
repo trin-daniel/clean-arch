@@ -3,7 +3,7 @@ import { SurveyModel } from '../../../domain/models/survey'
 import { DbLoadSurveys } from './db-load-surveys'
 import { set, reset } from 'mockdate'
 
-interface SystemUnderTestTypes {
+type SystemUnderTestTypes = {
   systemUnderTest: DbLoadSurveys,
   loadSurveysRepositoryStub: LoadSurveysRepository
 }

@@ -1,6 +1,4 @@
-import { DbAuthentication } from './db-authentication'
-import
-{
+import {
   AccountModel,
   LoadAccountByEmailRepository,
   AuthenticationModel,
@@ -8,6 +6,16 @@ import
   Encrypter,
   UpdateAccessTokenRepository
 } from './db-authentication-protocols'
+
+import { DbAuthentication } from './db-authentication'
+
+type SystemUnderTestTypes = {
+  systemUnderTest:DbAuthentication,
+  loadAccountByEmailRepositoryStub:LoadAccountByEmailRepository,
+  hashComparerStub: HashComparer,
+  encrypterStub: Encrypter,
+  updateAccessTokenRepositoryStub:UpdateAccessTokenRepository
+}
 
 const makeFakeAccount = ():AccountModel => ({
   id: 'any_id',
@@ -56,14 +64,6 @@ const makeFakeAuthentication = ():AuthenticationModel => ({
   email: 'any_email@gmail.com',
   password: 'any_password'
 })
-
-interface SystemUnderTestTypes{
-  systemUnderTest:DbAuthentication,
-  loadAccountByEmailRepositoryStub:LoadAccountByEmailRepository,
-  hashComparerStub: HashComparer,
-  encrypterStub: Encrypter,
-  updateAccessTokenRepositoryStub:UpdateAccessTokenRepository
-}
 
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()

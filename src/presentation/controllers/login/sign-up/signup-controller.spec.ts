@@ -23,6 +23,13 @@ import
 import { SignUpController } from './signup-controller'
 import { HttpRequest } from '../../../protocols'
 
+type SystemUnderTestTypes = {
+  systemUnderTest: SignUpController,
+  addAccountStub: AddAccount,
+  validationStub: Validation
+  authenticationStub: Authentication
+}
+
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
     async add (account: AddAccountModel):Promise<AccountModel> {
@@ -50,12 +57,6 @@ const makeAuthentication = ():Authentication => {
   return new AuthenticationStub()
 }
 
-interface SystemUnderTestTypes{
-  systemUnderTest: SignUpController,
-  addAccountStub: AddAccount,
-  validationStub: Validation
-  authenticationStub: Authentication
-}
 const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const addAccountStub = makeAddAccount()
   const validationStub = makeValidation()
@@ -109,6 +110,7 @@ describe('component signUp controller', () => {
       password: 'any_password'
     })
   })
+
   test('Should return 403 if AddAccount returns null', async () => {
     const { systemUnderTest, addAccountStub } = makeSystemUnderTest()
     jest.spyOn(addAccountStub, 'add')
@@ -144,6 +146,7 @@ describe('component signUp controller', () => {
       badRequest(new MissingParamError('any_field'))
     )
   })
+
   test('Should call Authentication with correct values', async () => {
     const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
     const authSpy = jest.spyOn(authenticationStub, 'auth')
