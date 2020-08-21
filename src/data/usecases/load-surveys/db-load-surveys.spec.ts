@@ -1,6 +1,6 @@
-import { LoadSurveysRepository } from '../../protocols/db/survey/load-surveys-repository'
-import { SurveyModel } from '../../../domain/models/survey'
+import { LoadSurveysRepository, SurveyModel } from './db-load-surveys-protocols'
 import { DbLoadSurveys } from './db-load-surveys'
+
 import { set, reset } from 'mockdate'
 
 type SystemUnderTestTypes = {
