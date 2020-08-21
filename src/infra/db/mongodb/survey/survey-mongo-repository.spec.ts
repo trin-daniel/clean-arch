@@ -1,7 +1,7 @@
 import { MongoHelper } from '../helpers/mongo-helper'
 import { SurveyMongoRepository } from './survey-mongo-repository'
-import { Collection } from 'mongodb'
 import { AddSurveyModel } from '../../../../domain/usecases/add-survey'
+import { Collection } from 'mongodb'
 
 const makeSystemUnderTest = ():SurveyMongoRepository => {
   return new SurveyMongoRepository()
@@ -77,6 +77,23 @@ describe('SurveyMongoRepository', () => {
       const surveys = await systemUnderTest.loadAll()
 
       expect(surveys.length).toBe(0)
+    })
+  })
+
+  describe('SurveyMongoRepository method loadById', () => {
+    test('Should load survey by id on success', async () => {
+      const result = await surveyCollection.insertOne({
+        question: 'any_question',
+        answers: [{
+          image: 'any_image',
+          answer: 'any_answer'
+        }]
+      })
+      const id = result.ops[0]._id
+      const systemUnderTest = makeSystemUnderTest()
+      const survey = await systemUnderTest.loadById(id)
+
+      expect(survey).toBeTruthy()
     })
   })
 })
