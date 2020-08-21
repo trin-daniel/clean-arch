@@ -45,7 +45,7 @@ const makeSystemUnderTest = (): SystemUnderTestTypes => {
   }
 }
 
-describe('', () => {
+describe('DbSaveSurveyResult usecase', () => {
   beforeAll(() => {
     set(new Date())
   })
@@ -65,5 +65,16 @@ describe('', () => {
 
     await systemUnderTest.save(surveyResult)
     expect(saveSpy).toHaveBeenCalledWith(surveyResult)
+  })
+
+  test('Should throw if SaveSurveyResultRepository throws', async () => {
+    const { systemUnderTest, saveSurveyResultRepositoryStub } = makeSystemUnderTest()
+    jest.spyOn(saveSurveyResultRepositoryStub, 'save')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
+    const promise = systemUnderTest.save(makeFakeSurveyResultData())
+
+    await expect(promise).rejects.toThrow()
   })
 })
