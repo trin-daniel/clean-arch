@@ -2,7 +2,8 @@ import {
   Controller,
   HttpResponse,
   HttpRequest,
-  LoadSurveyById
+  LoadSurveyById,
+  SaveSurveyResult
 } from './save-survey-result-controller-protocols'
 
 import { forbidden, serverError } from '../../../helpers/http/http-helper'
@@ -10,13 +11,15 @@ import { InvalidParamErrors } from '../../../errors'
 
 export class SaveSurveyResultController implements Controller {
   constructor (
-    private readonly LoadSurveyById: LoadSurveyById
+    private readonly LoadSurveyById: LoadSurveyById,
+    private readonly saveSurveyResult: SaveSurveyResult
   ) {}
 
   public async handle (request: HttpRequest):Promise<HttpResponse> {
     try {
       const { surveyId } = request.params
       const { answer } = request.body
+      const { accountId } = request
 
       const survey = await this.LoadSurveyById.loadById(surveyId)
 
@@ -28,6 +31,12 @@ export class SaveSurveyResultController implements Controller {
       } else {
         return forbidden(new InvalidParamErrors('surveyId'))
       }
+      await this.saveSurveyResult.save({
+        accountId,
+        answer,
+        surveyId,
+        date: new Date()
+      })
       return null
     } catch (err) {
       return serverError(err)
