@@ -69,6 +69,7 @@ describe('SurveyMongoRepository', () => {
 
       expect(surveys.length).toBe(2)
       expect(surveys[0].question).toBe('any_question')
+      expect(surveys[0].id).toBeTruthy()
       expect(surveys[1].question).toBe('other_question')
     })
 
@@ -94,6 +95,7 @@ describe('SurveyMongoRepository', () => {
       const survey = await systemUnderTest.loadById(id)
 
       expect(survey).toBeTruthy()
+      expect(survey.id).toBeTruthy()
     })
   })
 })
