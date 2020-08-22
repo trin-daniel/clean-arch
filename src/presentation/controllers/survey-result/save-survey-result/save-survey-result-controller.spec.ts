@@ -7,10 +7,15 @@ import {
   SaveSurveyResultModel
 } from './save-survey-result-controller-protocols'
 
-import { forbidden, serverError } from '../../../helpers/http/http-helper'
-import { InvalidParamErrors } from '../../../errors'
+import {
+  forbidden,
+  serverError,
+  success
+} from '../../../helpers/http/http-helper'
 
+import { InvalidParamErrors } from '../../../errors'
 import { SaveSurveyResultController } from './save-survey-result-controller'
+
 import { set, reset } from 'mockdate'
 
 type SystemUnderTestTypes = {
@@ -149,5 +154,11 @@ describe('SaveSurveyResult Controller', () => {
       )
     const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should return 200 on success', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(success(makeFakeSurveyResult()))
   })
 })
