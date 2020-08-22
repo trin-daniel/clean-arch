@@ -1,13 +1,10 @@
 export type HttpRequest = {
-  body?: {
-    [key: string]:any,
-  }
+  body?:any
   headers?:any
+  params?:any
 }
 
 export type HttpResponse = {
-  statusCode: number;
-  body?: {
-    [key: string]:any,
-  };
+  statusCode: number
+  body?:any
 }
