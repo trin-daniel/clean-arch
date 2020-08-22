@@ -4,6 +4,9 @@ import {
   SurveyModel
 } from './save-survey-result-controller-protocols'
 
+import { forbidden } from '../../../helpers/http/http-helper'
+import { InvalidParamErrors } from '../../../errors'
+
 import { SaveSurveyResultController } from './save-survey-result-controller'
 
 type SystemUnderTestTypes = {
@@ -53,5 +56,15 @@ describe('SaveSurveyResult Controller', () => {
 
     await systemUnderTest.handle(makeFakeRequest())
     expect(loadByIdSpy).toHaveBeenCalledWith('any_survey_id')
+  })
+
+  test('Should return 403 if LoadSurveyById returns null', async () => {
+    const { systemUnderTest, loadSurveyByIdStub } = makeSystemUnderTest()
+    jest.spyOn(loadSurveyByIdStub, 'loadById')
+      .mockReturnValueOnce(
+        new Promise(resolve => resolve(null))
+      )
+    const response = await systemUnderTest.handle(makeFakeRequest())
+    expect(response).toEqual(forbidden(new InvalidParamErrors('surveyId')))
   })
 })
