@@ -17,6 +17,9 @@ type SystemUnderTestTypes = {
 const makeFakeRequest = (): HttpRequest => ({
   params: {
     surveyId: 'any_survey_id'
+  },
+  body: {
+    answer: 'any_answer'
   }
 })
 
@@ -76,5 +79,19 @@ describe('SaveSurveyResult Controller', () => {
       )
     const response = await systemUnderTest.handle(makeFakeRequest())
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should return 403 if an invalid answer is provided', async () => {
+    const { systemUnderTest } = makeSystemUnderTest()
+    const response = await systemUnderTest.handle({
+      params: {
+        surveyId: 'any_survey_id'
+      },
+      body: {
+        answer: 'wrong_answer'
+      }
+    })
+
+    expect(response).toEqual(forbidden(new InvalidParamErrors('answer')))
   })
 })
