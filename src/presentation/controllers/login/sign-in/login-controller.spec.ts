@@ -2,7 +2,7 @@ import { LoginController } from './login-controller'
 import { badRequest, serverError, unauthorized, success } from '../../../helpers/http/http-helper'
 import { MissingParamError } from '../../../errors'
 import { HttpRequest, Authentication, Validation } from './login-controller-protocols'
-import { AuthenticationModel } from '../../../../domain/usecases/authentication'
+import { AuthenticationModel } from '../../../../domain/usecases/account/authentication'
 
 type SystemUnderTestTypes = {
   systemUnderTest: LoginController
