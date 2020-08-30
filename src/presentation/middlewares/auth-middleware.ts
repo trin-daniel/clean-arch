@@ -25,7 +25,7 @@ export class AuthMiddleware implements Middleware {
       if (token) {
         const account = await this.loadAccountByToken.load(token, this.role)
         if (account) {
-          return success({ account_id: account.id })
+          return success({ accountId: account.id })
         }
       }
       return forbidden(new AccessDeniedError())

@@ -75,7 +75,7 @@ describe('Auth Middleware', () => {
   test('Should return 200 if LoadAccountByToken returns an account', async () => {
     const { systemUnderTest } = makeSystemUnderTest()
     const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(success({ account_id: 'valid_id' }))
+    expect(response).toEqual(success({ accountId: 'valid_id' }))
   })
 
   test('Should return 500 if LoadAccountByToken throws', async () => {
