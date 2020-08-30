@@ -1,25 +1,19 @@
-import
-{
-  MissingParamError,
-  ServerError,
-  EmailInUseError
-} from '../../../errors'
-import
-{
+import { MissingParamError, ServerError, EmailInUseError } from '../../../errors'
+import {
   AccountModel,
   AddAccount,
-  AddAccountModel,
+  AddAccountParams,
   Validation,
   Authentication,
-  AuthenticationModel
+  AuthenticationParams
 } from './signup-controller-protocols'
-import
-{
+import {
   success,
   serverError,
   badRequest,
   forbidden
 } from '../../../helpers/http/http-helper'
+
 import { SignUpController } from './signup-controller'
 import { HttpRequest } from '../../../protocols'
 
@@ -32,7 +26,7 @@ type SystemUnderTestTypes = {
 
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
-    async add (account: AddAccountModel):Promise<AccountModel> {
+    async add (account: AddAccountParams):Promise<AccountModel> {
       return new Promise((resolve) => resolve(makeFakeAccount()))
     }
   }
@@ -50,7 +44,7 @@ const makeValidation = (): Validation => {
 
 const makeAuthentication = ():Authentication => {
   class AuthenticationStub implements Authentication {
-    async auth (authentication: AuthenticationModel):Promise<string> {
+    async auth (authentication: AuthenticationParams):Promise<string> {
       return new Promise(resolve => resolve('any_token'))
     }
   }

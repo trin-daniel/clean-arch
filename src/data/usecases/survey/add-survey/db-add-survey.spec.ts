@@ -1,5 +1,5 @@
 import { set, reset } from 'mockdate'
-import { AddSurveyModel, AddSurveyRepository } from './db-add-survey-protocols'
+import { AddSurveyParams, AddSurveyRepository } from './db-add-survey-protocols'
 import { DbAddSurvey } from './db-add-survey'
 
 type SystemUnderTestTypes = {
@@ -9,7 +9,7 @@ type SystemUnderTestTypes = {
 
 const makeAddSurveyRepository = (): AddSurveyRepository => {
   class AddSurveyRepositoryStub implements AddSurveyRepository {
-    public async add (surveyData: AddSurveyModel):Promise<void> {
+    public async add (surveyData: AddSurveyParams):Promise<void> {
       return new Promise(resolve => resolve())
     }
   }
@@ -25,7 +25,7 @@ const makeSystemUnderTest = () :SystemUnderTestTypes => {
   }
 }
 
-const makeFakeSurveyData = (): AddSurveyModel => ({
+const makeFakeSurveyData = (): AddSurveyParams => ({
   question: 'any_question',
   answers: [{
     image: 'any_image',

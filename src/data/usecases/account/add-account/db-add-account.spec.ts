@@ -1,6 +1,6 @@
 import {
   AccountModel,
-  AddAccountModel,
+  AddAccountParams,
   AddAccountRepository,
   LoadAccountByEmailRepository,
   Hasher
@@ -26,16 +26,16 @@ const makeHasher = ():Hasher => {
   return new HasherStub()
 }
 
-const makeAddAccountRepostory = ():AddAccountRepository => {
+const makeAddAccountRepostory = (): AddAccountRepository => {
   class AddAccountRepositoryStub implements AddAccountRepository {
-    public async add (account: AddAccountModel): Promise<AccountModel> {
+    public async add (account: AddAccountParams): Promise<AccountModel> {
       return new Promise(resolve => resolve(makeFakeAccount()))
     }
   }
   return new AddAccountRepositoryStub()
 }
 
-const makeLoadAccountByEmailRepository = ():LoadAccountByEmailRepository => {
+const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     public async loadByEmail (email:string):Promise<AccountModel> {
       return new Promise(resolve => resolve(null))
@@ -44,7 +44,7 @@ const makeLoadAccountByEmailRepository = ():LoadAccountByEmailRepository => {
   return new LoadAccountByEmailRepositoryStub()
 }
 
-const makeSystemUnderTest = ():SystemUnderTestTypes => {
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const hasherStub = makeHasher()
   const addAccountRepositoryStub = makeAddAccountRepostory()
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
@@ -57,14 +57,14 @@ const makeSystemUnderTest = ():SystemUnderTestTypes => {
   }
 }
 
-const makeFakeAccount = ():AccountModel => ({
+const makeFakeAccount = (): AccountModel => ({
   id: 'valid_id',
   name: 'valid_name',
   email: 'valid_email@gmail.com',
   password: 'hashed_password'
 })
 
-const makeFakeAccountData = ():AddAccountModel => ({
+const makeFakeAccountData = (): AddAccountParams => ({
   name: 'valid_name',
   email: 'valid_email@gmail.com',
   password: 'valid_password'
