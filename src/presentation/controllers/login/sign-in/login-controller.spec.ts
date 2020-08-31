@@ -1,16 +1,27 @@
+import {
+  badRequest,
+  serverError,
+  unauthorized,
+  success
+} from '../../../helpers/http/http-helper'
+
+import {
+  HttpRequest,
+  Authentication,
+  Validation
+} from './login-controller-protocols'
+
 import { LoginController } from './login-controller'
-import { badRequest, serverError, unauthorized, success } from '../../../helpers/http/http-helper'
 import { MissingParamError } from '../../../errors'
-import { HttpRequest, Authentication, Validation } from './login-controller-protocols'
 import { AuthenticationParams } from '../../../../domain/usecases/account/authentication'
 
-type SystemUnderTestTypes = {
-  systemUnderTest: LoginController
+type SutTypes = {
+  sut: LoginController
   authenticationStub: Authentication
   validationStub: Validation
 }
 
-const makeValidation = (): Validation => {
+const mockValidation = (): Validation => {
   class ValidationStub implements Validation {
     validate (input:any):Error {
       return null
@@ -19,7 +30,7 @@ const makeValidation = (): Validation => {
   return new ValidationStub()
 }
 
-const makeAuthentication = ():Authentication => {
+const mockAuthentication = ():Authentication => {
   class AuthenticationStub implements Authentication {
     async auth (authentication: AuthenticationParams):Promise<string> {
       return new Promise(resolve => resolve('any_token'))
@@ -28,78 +39,69 @@ const makeAuthentication = ():Authentication => {
   return new AuthenticationStub()
 }
 
-const makeSystemUnderTest = (): SystemUnderTestTypes => {
-  const validationStub = makeValidation()
-  const authenticationStub = makeAuthentication()
-  const systemUnderTest = new LoginController(authenticationStub, validationStub)
+const makeSut = (): SutTypes => {
+  const validationStub = mockValidation()
+  const authenticationStub = mockAuthentication()
+  const sut = new LoginController(authenticationStub, validationStub)
   return {
-    systemUnderTest,
+    sut,
     authenticationStub,
     validationStub
   }
 }
 
-const makeFakeRequest = ():HttpRequest => ({
+const mockFakeRequest = ():HttpRequest => ({
   body: {
     email: 'any_email@gmail.com',
     password: 'any_password'
   }
 })
 
-describe('Login Controller', () => {
+describe('Sign-in Controller', () => {
   test('Should call Authentication with correct values', async () => {
-    const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
-    const authSpy = jest.spyOn(authenticationStub, 'auth')
-      .mockImplementationOnce(() => {
-        throw new Error()
-      })
-    await systemUnderTest.handle(makeFakeRequest())
+    const { sut, authenticationStub } = makeSut()
+    const authSpy = jest.spyOn(authenticationStub, 'auth').mockImplementationOnce(() => { throw new Error() })
+
+    await sut.handle(mockFakeRequest())
     expect(authSpy).toHaveBeenCalledWith({ email: 'any_email@gmail.com', password: 'any_password' })
   })
 
   test('Should return 401 if invalid credentials  are provided', async () => {
-    const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
-    jest.spyOn(authenticationStub, 'auth')
-      .mockReturnValueOnce(
-        new Promise(resolve => resolve(undefined))
-      )
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const { sut, authenticationStub } = makeSut()
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(new Promise(resolve => resolve(undefined)))
+
+    const response = await sut.handle(mockFakeRequest())
     expect(response).toEqual(unauthorized())
   })
 
   test('Should return 500 if Authentication throws', async () => {
-    const { systemUnderTest, authenticationStub } = makeSystemUnderTest()
-    jest.spyOn(authenticationStub, 'auth')
-      .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
-      )
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const { sut, authenticationStub } = makeSut()
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const response = await sut.handle(mockFakeRequest())
+
     expect(response).toEqual(serverError(new Error()))
   })
 
   test('Should return 200 if valid credentials  are provided', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const { sut } = makeSut()
+    const response = await sut.handle(mockFakeRequest())
+
     expect(response).toEqual(success({ accessToken: 'any_token' }))
   })
 
   test('Should call Validation with correct values', async () => {
-    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
-    const request = makeFakeRequest()
-    await systemUnderTest.handle(request)
-    expect(validateSpy).toHaveBeenCalledWith(request.body)
+
+    await sut.handle(mockFakeRequest())
+    expect(validateSpy).toHaveBeenCalledWith(mockFakeRequest().body)
   })
 
   test('Should return 400 if Validation returns an error', async () => {
-    const { systemUnderTest, validationStub } = makeSystemUnderTest()
-    jest.spyOn(validationStub, 'validate')
-      .mockReturnValueOnce(
-        new MissingParamError('any_field')
-      )
-    const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(
-      badRequest(new MissingParamError('any_field'))
-    )
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('any_field'))
+
+    const response = await sut.handle(mockFakeRequest())
+    expect(response).toEqual(badRequest(new MissingParamError('any_field')))
   })
 })

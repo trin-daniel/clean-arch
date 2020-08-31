@@ -7,24 +7,19 @@ import {
   SaveSurveyResultParams
 } from './save-survey-result-controller-protocols'
 
-import {
-  forbidden,
-  serverError,
-  success
-} from '../../../helpers/http/http-helper'
+import { SaveSurveyResultController } from './save-survey-result-controller'
+import { forbidden, serverError, success } from '../../../helpers/http/http-helper'
 
 import { InvalidParamErrors } from '../../../errors'
-import { SaveSurveyResultController } from './save-survey-result-controller'
-
 import { set, reset } from 'mockdate'
 
-type SystemUnderTestTypes = {
+type SutTypes = {
   loadSurveyByIdStub: LoadSurveyById
-  systemUnderTest: SaveSurveyResultController
+  sut: SaveSurveyResultController
   saveSurveyResultStub: SaveSurveyResult
 }
 
-const makeFakeRequest = (): HttpRequest => ({
+const mockRequest = (): HttpRequest => ({
   params: {
     surveyId: 'any_survey_id'
   },
@@ -34,7 +29,7 @@ const makeFakeRequest = (): HttpRequest => ({
   accountId: 'any_account_id'
 })
 
-const makeFakeSurvey = (): SurveyModel => ({
+const mockSurvey = (): SurveyModel => ({
   id: 'any_id',
   question: 'any_question',
   answers: [{
@@ -44,7 +39,7 @@ const makeFakeSurvey = (): SurveyModel => ({
   date: new Date()
 })
 
-const makeFakeSurveyResult = (): SurveyResultModel => ({
+const mockSurveyResult = (): SurveyResultModel => ({
   id: 'valid_id',
   surveyId: 'valid_survey_id',
   accountId: 'valid_account_id',
@@ -52,31 +47,40 @@ const makeFakeSurveyResult = (): SurveyResultModel => ({
   date: new Date()
 })
 
-const makeLoadSurveyById = (): LoadSurveyById => {
+const mockLoadSurveyById = (): LoadSurveyById => {
   class LoadSurveyByIdStub implements LoadSurveyById {
     public async loadById (id: string):Promise<SurveyModel> {
-      return new Promise(resolve => resolve(makeFakeSurvey()))
+      return new Promise(resolve => resolve(mockSurvey()))
     }
   }
   return new LoadSurveyByIdStub()
 }
 
-const makeSaveSurveyResult = (): SaveSurveyResult => {
+const mockSaveSurveyResult = (): SaveSurveyResult => {
   class SaveSurveyResultStub implements SaveSurveyResult {
     public async save (data: SaveSurveyResultParams):Promise<SurveyResultModel> {
-      return new Promise(resolve => resolve(makeFakeSurveyResult()))
+      return new Promise(resolve => resolve(mockSurveyResult()))
     }
   }
   return new SaveSurveyResultStub()
 }
 
-const makeSystemUnderTest = (): SystemUnderTestTypes => {
-  const loadSurveyByIdStub = makeLoadSurveyById()
-  const saveSurveyResultStub = makeSaveSurveyResult()
-  const systemUnderTest = new SaveSurveyResultController(loadSurveyByIdStub, saveSurveyResultStub)
+const mockRequestWithoutToken = (): any => ({
+  params: {
+    surveyId: 'any_survey_id'
+  },
+  body: {
+    answer: 'wrong_answer'
+  }
+})
+
+const makeSystemUnderTest = (): SutTypes => {
+  const loadSurveyByIdStub = mockLoadSurveyById()
+  const saveSurveyResultStub = mockSaveSurveyResult()
+  const sut = new SaveSurveyResultController(loadSurveyByIdStub, saveSurveyResultStub)
 
   return {
-    systemUnderTest,
+    sut,
     loadSurveyByIdStub,
     saveSurveyResultStub
   }
@@ -92,52 +96,41 @@ describe('SaveSurveyResult Controller', () => {
   })
 
   test('Should call LoadSurveyById with correct values', async () => {
-    const { systemUnderTest, loadSurveyByIdStub } = makeSystemUnderTest()
+    const { sut, loadSurveyByIdStub } = makeSystemUnderTest()
     const loadByIdSpy = jest.spyOn(loadSurveyByIdStub, 'loadById')
 
-    await systemUnderTest.handle(makeFakeRequest())
+    await sut.handle(mockRequest())
     expect(loadByIdSpy).toHaveBeenCalledWith('any_survey_id')
   })
 
   test('Should return 403 if LoadSurveyById returns null', async () => {
-    const { systemUnderTest, loadSurveyByIdStub } = makeSystemUnderTest()
-    jest.spyOn(loadSurveyByIdStub, 'loadById')
-      .mockReturnValueOnce(
-        new Promise(resolve => resolve(null))
-      )
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const { sut, loadSurveyByIdStub } = makeSystemUnderTest()
+    jest.spyOn(loadSurveyByIdStub, 'loadById').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+
+    const response = await sut.handle(mockRequest())
     expect(response).toEqual(forbidden(new InvalidParamErrors('surveyId')))
   })
 
   test('Should return 500 if LoadSurveyById throws', async () => {
-    const { systemUnderTest, loadSurveyByIdStub } = makeSystemUnderTest()
-    jest.spyOn(loadSurveyByIdStub, 'loadById')
-      .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
-      )
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const { sut, loadSurveyByIdStub } = makeSystemUnderTest()
+    jest.spyOn(loadSurveyByIdStub, 'loadById').mockImplementationOnce(() => { throw new Error() })
+
+    const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))
   })
 
   test('Should return 403 if an invalid answer is provided', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const response = await systemUnderTest.handle({
-      params: {
-        surveyId: 'any_survey_id'
-      },
-      body: {
-        answer: 'wrong_answer'
-      }
-    })
+    const { sut } = makeSystemUnderTest()
+    const response = await sut.handle(mockRequestWithoutToken())
 
     expect(response).toEqual(forbidden(new InvalidParamErrors('answer')))
   })
 
   test('Should call SaveSurveyResult with correct values', async () => {
-    const { systemUnderTest, saveSurveyResultStub } = makeSystemUnderTest()
+    const { sut, saveSurveyResultStub } = makeSystemUnderTest()
     const saveSpy = jest.spyOn(saveSurveyResultStub, 'save')
 
-    await systemUnderTest.handle(makeFakeRequest())
+    await sut.handle(mockRequest())
     expect(saveSpy).toHaveBeenCalledWith({
       accountId: 'any_account_id',
       surveyId: 'any_survey_id',
@@ -147,18 +140,17 @@ describe('SaveSurveyResult Controller', () => {
   })
 
   test('Should return 500 if SaveSurveyResult throws', async () => {
-    const { systemUnderTest, saveSurveyResultStub } = makeSystemUnderTest()
-    jest.spyOn(saveSurveyResultStub, 'save')
-      .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
-      )
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const { sut, saveSurveyResultStub } = makeSystemUnderTest()
+    jest.spyOn(saveSurveyResultStub, 'save').mockImplementationOnce(() => { throw new Error() })
+
+    const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))
   })
 
   test('Should return 200 on success', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const response = await systemUnderTest.handle(makeFakeRequest())
-    expect(response).toEqual(success(makeFakeSurveyResult()))
+    const { sut } = makeSystemUnderTest()
+    const response = await sut.handle(mockRequest())
+
+    expect(response).toEqual(success(mockSurveyResult()))
   })
 })

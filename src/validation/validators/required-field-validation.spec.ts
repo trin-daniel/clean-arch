@@ -1,19 +1,21 @@
 import { RequiredFieldValidation } from './required-field-validation'
 import { MissingParamError } from '../../presentation/errors'
 
-const makeSystemUnderTest = (): RequiredFieldValidation => {
+const makeSut = (): RequiredFieldValidation => {
   return new RequiredFieldValidation('field')
 }
-describe('RequiredFieldValidation', () => {
+describe('Required field validation', () => {
   test('Should return a MissingParamError if validation fails', () => {
-    const systemUnderTest = makeSystemUnderTest()
-    const error = systemUnderTest.validate({ any_field: 'any_value' })
-    expect(error).toEqual(new MissingParamError('field'))
+    const sut = makeSut()
+    const response = sut.validate({ any_field: 'any_value' })
+
+    expect(response).toEqual(new MissingParamError('field'))
   })
 
   test('Should not return if validation succeeds', () => {
-    const systemUnderTest = makeSystemUnderTest()
-    const error = systemUnderTest.validate({ field: 'any_value' })
-    expect(error).toBeFalsy()
+    const sut = makeSut()
+    const response = sut.validate({ field: 'any_value' })
+
+    expect(response).toBeFalsy()
   })
 })

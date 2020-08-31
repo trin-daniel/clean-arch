@@ -1,21 +1,19 @@
-import { MongoHelper as systemUnderTest } from './mongo-helper'
-declare const process :{
-  env : {
-    MONGO_URL: string
-  }
-}
+import { MongoHelper as sut } from './mongo-helper'
+
 describe('Mongo Helper', () => {
   beforeAll(async () => {
-    await systemUnderTest.connect(process.env.MONGO_URL)
+    await sut.connect(process.env.MONGO_URL)
   })
   afterAll(async () => {
-    await systemUnderTest.disconnect()
+    await sut.disconnect()
   })
-  test('Should reconect if mongodb is down', async () => {
-    let accountCollection = await systemUnderTest.getCollection('accounts')
+
+  test('Should reconnect if mongo is down', async () => {
+    let accountCollection = await sut.getCollection('accounts')
     expect(accountCollection).toBeTruthy()
-    await systemUnderTest.disconnect()
-    accountCollection = await systemUnderTest.getCollection('accounts')
+    await sut.disconnect()
+
+    accountCollection = await sut.getCollection('accounts')
     expect(accountCollection).toBeTruthy()
   })
 })

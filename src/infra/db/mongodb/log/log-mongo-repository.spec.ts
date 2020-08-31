@@ -1,18 +1,13 @@
 import { MongoHelper } from '../helpers/mongo-helper'
 import { Collection } from 'mongodb'
 import { LogMongoRepository } from './log-mongo-repository'
-declare const process:{
-  env:{
-    MONGO_URL:string
-  }
-}
 
-const makeSystemUnderTest = ():LogMongoRepository => {
+const makeSut = (): LogMongoRepository => {
   return new LogMongoRepository()
 }
 
 describe('Log Mongo Repository', () => {
-  let errorCollection:Collection
+  let error: Collection
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -20,14 +15,16 @@ describe('Log Mongo Repository', () => {
   afterAll(async () => {
     await MongoHelper.disconnect()
   })
+
   beforeEach(async () => {
-    errorCollection = await MongoHelper.getCollection('errors')
-    await errorCollection.deleteMany({})
+    error = await MongoHelper.getCollection('errors')
+    await error.deleteMany({})
   })
+
   test('Should create an error log on success', async () => {
-    const systemUnderTest = makeSystemUnderTest()
-    await systemUnderTest.logError('any_error')
-    const count = await errorCollection.countDocuments()
+    const sut = makeSut()
+    await sut.logError('any_error')
+    const count = await error.countDocuments()
     expect(count).toBe(1)
   })
 })

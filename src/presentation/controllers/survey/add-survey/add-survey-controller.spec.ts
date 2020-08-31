@@ -1,15 +1,27 @@
-import { HttpRequest, AddSurvey, AddSurveyParams, Validation } from './add-survey-controller-protocols'
+import {
+  AddSurvey,
+  AddSurveyParams,
+  HttpRequest,
+  Validation
+} from './add-survey-controller-protocols'
+
+import {
+  badRequest,
+  serverError,
+  noContent
+} from '../../../helpers/http/http-helper'
+
 import { AddSurveyController } from './add-survey-controller'
-import { badRequest, serverError, noContent } from '../../../helpers/http/http-helper'
+
 import { set, reset } from 'mockdate'
 
-type SystemUnderTestTypes = {
-  systemUnderTest: AddSurveyController
+type SutTypes = {
+  sut: AddSurveyController
   validationStub: Validation,
   addSurveyStub: AddSurvey
 }
 
-const makeValidation = (): Validation => {
+const mockValidation = (): Validation => {
   class ValidationStub implements Validation {
     validate (input: any):Error {
       return null
@@ -18,7 +30,7 @@ const makeValidation = (): Validation => {
   return new ValidationStub()
 }
 
-const makeAddSurvey = (): AddSurvey => {
+const mockAddSurvey = (): AddSurvey => {
   class AddSurveyStub implements AddSurvey {
     add (data: AddSurveyParams):Promise<void> {
       return new Promise(resolve => resolve())
@@ -28,18 +40,18 @@ const makeAddSurvey = (): AddSurvey => {
   return new AddSurveyStub()
 }
 
-const makeSystemUnderTest = (): SystemUnderTestTypes => {
-  const validationStub = makeValidation()
-  const addSurveyStub = makeAddSurvey()
-  const systemUnderTest = new AddSurveyController(validationStub, addSurveyStub)
+const makeSut = (): SutTypes => {
+  const validationStub = mockValidation()
+  const addSurveyStub = mockAddSurvey()
+  const sut = new AddSurveyController(validationStub, addSurveyStub)
   return {
-    systemUnderTest,
+    sut,
     validationStub,
     addSurveyStub
   }
 }
 
-const makeFakeRequest = ():HttpRequest => ({
+const mockRequest = ():HttpRequest => ({
   body: {
     question: 'any_question',
     answers: [{
@@ -60,45 +72,41 @@ describe('AddSurvey Controller', () => {
   })
 
   test('Should call Validation with correct values', async () => {
-    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
-    const request = makeFakeRequest()
 
-    await systemUnderTest.handle(request)
-    expect(validateSpy).toHaveBeenCalledWith(request.body)
+    await sut.handle(mockRequest())
+    expect(validateSpy).toHaveBeenCalledWith(mockRequest().body)
   })
 
   test('Should return 400 if Validation fails', async () => {
-    const { systemUnderTest, validationStub } = makeSystemUnderTest()
+    const { sut, validationStub } = makeSut()
     jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new Error())
-    const response = await systemUnderTest.handle(makeFakeRequest())
+
+    const response = await sut.handle(mockRequest())
     expect(response).toEqual(badRequest(new Error()))
   })
 
   test('Should call AddSurvey with correct values', async () => {
-    const { systemUnderTest, addSurveyStub } = makeSystemUnderTest()
+    const { sut, addSurveyStub } = makeSut()
     const addSpy = jest.spyOn(addSurveyStub, 'add')
-    const request = makeFakeRequest()
 
-    await systemUnderTest.handle(request)
-    expect(addSpy).toHaveBeenCalledWith(request.body)
+    await sut.handle(mockRequest())
+    expect(addSpy).toHaveBeenCalledWith(mockRequest().body)
   })
 
   test('Should returns 500 if AddSurvey throws', async () => {
-    const { systemUnderTest, addSurveyStub } = makeSystemUnderTest()
-    jest.spyOn(addSurveyStub, 'add')
-      .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
-      )
+    const { sut, addSurveyStub } = makeSut()
+    jest.spyOn(addSurveyStub, 'add').mockImplementationOnce(() => { throw new Error() })
 
-    const response = await systemUnderTest.handle(makeFakeRequest())
+    const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))
   })
 
   test('Should returns 204 on success', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const request = makeFakeRequest()
-    const response = await systemUnderTest.handle(request)
+    const { sut } = makeSut()
+    const response = await sut.handle(mockRequest())
+
     expect(response).toEqual(noContent())
   })
 })

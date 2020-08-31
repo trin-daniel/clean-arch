@@ -1,32 +1,38 @@
-import { LoadSurveysController } from './load-surveys-controller'
+import {
+  success,
+  serverError,
+  noContent
+} from '../../../helpers/http/http-helper'
+
 import { SurveyModel, LoadSurveys } from './load-surveys-controller-protocols'
-import { success, serverError, noContent } from '../../../helpers/http/http-helper'
+import { LoadSurveysController } from './load-surveys-controller'
+
 import { set, reset } from 'mockdate'
 
-type SystemUnderTestTypes = {
-  systemUnderTest: LoadSurveysController
+type SutTypes = {
+  sut: LoadSurveysController
   loadSurveysStub: LoadSurveys
 }
 
-const makeLoadSurveys = (): LoadSurveys => {
+const mockLoadSurveys = (): LoadSurveys => {
   class LoadSurveysStub implements LoadSurveys {
     public async load ():Promise<SurveyModel[]> {
-      return new Promise(resolve => resolve(makeFakeSurveys()))
+      return new Promise(resolve => resolve(mockSurveys()))
     }
   }
   return new LoadSurveysStub()
 }
 
-const makeSystemUnderTest = ():SystemUnderTestTypes => {
-  const loadSurveysStub = makeLoadSurveys()
-  const systemUnderTest = new LoadSurveysController(loadSurveysStub)
+const makeSut = (): SutTypes => {
+  const loadSurveysStub = mockLoadSurveys()
+  const sut = new LoadSurveysController(loadSurveysStub)
   return {
-    systemUnderTest,
+    sut,
     loadSurveysStub
   }
 }
 
-const makeFakeSurveys = (): SurveyModel[] => {
+const mockSurveys = (): SurveyModel[] => {
   return [{
     id: 'any_id',
     question: 'any_question',
@@ -46,7 +52,7 @@ const makeFakeSurveys = (): SurveyModel[] => {
   }]
 }
 
-describe('LoadSurveys controller', () => {
+describe('LoadSurveys Controller', () => {
   beforeAll(() => {
     set(new Date())
   })
@@ -56,36 +62,33 @@ describe('LoadSurveys controller', () => {
   })
 
   test('Should call LoadSurveys', async () => {
-    const { systemUnderTest, loadSurveysStub } = makeSystemUnderTest()
+    const { sut, loadSurveysStub } = makeSut()
     const loadSpy = jest.spyOn(loadSurveysStub, 'load')
 
-    await systemUnderTest.handle({})
+    await sut.handle({})
     expect(loadSpy).toHaveBeenCalled()
   })
 
   test('Should return 200 on success', async () => {
-    const { systemUnderTest } = makeSystemUnderTest()
-    const response = await systemUnderTest.handle({})
+    const { sut } = makeSut()
+    const response = await sut.handle({})
 
-    expect(response).toEqual(success(makeFakeSurveys()))
+    expect(response).toEqual(success(mockSurveys()))
   })
 
   test('Should return 204 if LoadSurveys returns empty', async () => {
-    const { systemUnderTest, loadSurveysStub } = makeSystemUnderTest()
+    const { sut, loadSurveysStub } = makeSut()
     jest.spyOn(loadSurveysStub, 'load').mockReturnValueOnce(new Promise(resolve => resolve([])))
-    const response = await systemUnderTest.handle({})
+    const response = await sut.handle({})
 
     expect(response).toEqual(noContent())
   })
 
   test('Should return 500 if LoadSurvey throws', async () => {
-    const { systemUnderTest, loadSurveysStub } = makeSystemUnderTest()
-    jest.spyOn(loadSurveysStub, 'load')
-      .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
-      )
-    const response = await systemUnderTest.handle({})
+    const { sut, loadSurveysStub } = makeSut()
+    jest.spyOn(loadSurveysStub, 'load').mockImplementationOnce(() => { throw new Error() })
 
+    const response = await sut.handle({})
     expect(response).toEqual(serverError(new Error()))
   })
 })

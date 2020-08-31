@@ -3,11 +3,11 @@ import { EmailValidation } from './email-validation'
 import { InvalidParamErrors } from '../../presentation/errors'
 
 type SystemUnderTestTypes = {
-  systemUnderTest: EmailValidation,
+  sut: EmailValidation,
   emailValidatorStub: EmailValidator,
 }
 
-const makeEmailValidator = ():EmailValidator => {
+const mockEmailValidator = ():EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email:string):boolean {
       return true
@@ -16,39 +16,37 @@ const makeEmailValidator = ():EmailValidator => {
   return new EmailValidatorStub()
 }
 
-const makeSystemUnderTest = (): SystemUnderTestTypes => {
-  const emailValidatorStub = makeEmailValidator()
-  const systemUnderTest = new EmailValidation('email', emailValidatorStub)
+const makeSut = (): SystemUnderTestTypes => {
+  const emailValidatorStub = mockEmailValidator()
+  const sut = new EmailValidation('email', emailValidatorStub)
+
   return {
-    systemUnderTest,
+    sut,
     emailValidatorStub
   }
 }
 
 describe('EmailValidator', () => {
   test('Should return an error if EmailValidator returns false', () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid')
-      .mockReturnValueOnce(false)
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
 
-    const error = systemUnderTest.validate({ email: 'any_email@gmail.com' })
+    const error = sut.validate({ email: 'any_email@gmail.com' })
     expect(error).toEqual(new InvalidParamErrors('email'))
   })
 
   test('Should call emailValidator with correct email', () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
+    const { sut, emailValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    systemUnderTest.validate({ email: 'any_email@gmail.com' })
+
+    sut.validate({ email: 'any_email@gmail.com' })
     expect(isValidSpy).toHaveBeenCalledWith('any_email@gmail.com')
   })
 
   test('Should throw if EmailValidator throws', () => {
-    const { systemUnderTest, emailValidatorStub } = makeSystemUnderTest()
-    jest.spyOn(emailValidatorStub, 'isValid')
-      .mockImplementationOnce(() => {
-        throw new Error()
-      })
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => { throw new Error() })
 
-    expect(systemUnderTest.validate).toThrow()
+    expect(sut.validate).toThrow()
   })
 })
