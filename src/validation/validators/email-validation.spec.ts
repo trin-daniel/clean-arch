@@ -2,7 +2,7 @@ import { EmailValidator } from '../protocols/email-validator'
 import { EmailValidation } from './email-validation'
 import { InvalidParamErrors } from '../../presentation/errors'
 
-type SystemUnderTestTypes = {
+type SutTypes = {
   sut: EmailValidation,
   emailValidatorStub: EmailValidator,
 }
@@ -16,7 +16,7 @@ const mockEmailValidator = ():EmailValidator => {
   return new EmailValidatorStub()
 }
 
-const makeSut = (): SystemUnderTestTypes => {
+const makeSut = (): SutTypes => {
   const emailValidatorStub = mockEmailValidator()
   const sut = new EmailValidation('email', emailValidatorStub)
 

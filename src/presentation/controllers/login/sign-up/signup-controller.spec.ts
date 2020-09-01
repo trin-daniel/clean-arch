@@ -89,7 +89,7 @@ const makeSut = (): SutTypes => {
 describe('Sign-Up Controller', () => {
   test('Should return error 500 if an exception occurs in addAccount', async () => {
     const { sut, addAccountStub } = makeSut()
-    jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => { throw new Error() })
+    jest.spyOn(addAccountStub, 'add').mockReturnValueOnce(Promise.reject(new Error()))
 
     const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new ServerError(new Error())))
@@ -109,7 +109,7 @@ describe('Sign-Up Controller', () => {
 
   test('Should return 403 if AddAccount returns null', async () => {
     const { sut, addAccountStub } = makeSut()
-    jest.spyOn(addAccountStub, 'add').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+    jest.spyOn(addAccountStub, 'add').mockReturnValueOnce(Promise.resolve(null))
 
     const response = await sut.handle(mockRequest())
     expect(response).toEqual(forbidden(new EmailInUseError()))
@@ -140,7 +140,7 @@ describe('Sign-Up Controller', () => {
 
   test('Should call Authentication with correct values', async () => {
     const { sut, authenticationStub } = makeSut()
-    const authSpy = jest.spyOn(authenticationStub, 'auth').mockImplementationOnce(() => { throw new Error() })
+    const authSpy = jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(Promise.reject(new Error()))
 
     await sut.handle(mockRequest())
     expect(authSpy).toHaveBeenCalledWith({ email: 'any_email@gmail.com', password: 'any_password' })
@@ -148,7 +148,7 @@ describe('Sign-Up Controller', () => {
 
   test('Should return 500 if Authentication throws', async () => {
     const { sut, authenticationStub } = makeSut()
-    jest.spyOn(authenticationStub, 'auth').mockImplementation(() => { throw new Error() })
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(Promise.reject(new Error()))
 
     const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))

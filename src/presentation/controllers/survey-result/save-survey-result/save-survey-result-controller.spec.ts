@@ -113,7 +113,7 @@ describe('SaveSurveyResult Controller', () => {
 
   test('Should return 500 if LoadSurveyById throws', async () => {
     const { sut, loadSurveyByIdStub } = makeSystemUnderTest()
-    jest.spyOn(loadSurveyByIdStub, 'loadById').mockImplementationOnce(() => { throw new Error() })
+    jest.spyOn(loadSurveyByIdStub, 'loadById').mockReturnValueOnce(Promise.reject(new Error()))
 
     const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))
@@ -141,7 +141,7 @@ describe('SaveSurveyResult Controller', () => {
 
   test('Should return 500 if SaveSurveyResult throws', async () => {
     const { sut, saveSurveyResultStub } = makeSystemUnderTest()
-    jest.spyOn(saveSurveyResultStub, 'save').mockImplementationOnce(() => { throw new Error() })
+    jest.spyOn(saveSurveyResultStub, 'save').mockReturnValueOnce(Promise.reject(new Error()))
 
     const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))

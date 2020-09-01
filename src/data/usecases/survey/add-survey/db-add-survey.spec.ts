@@ -3,11 +3,11 @@ import { AddSurveyParams, AddSurveyRepository } from './db-add-survey-protocols'
 import { DbAddSurvey } from './db-add-survey'
 
 type SystemUnderTestTypes = {
-  systemUnderTest: DbAddSurvey
+  sut: DbAddSurvey
   addSurveyRepositoryStub: AddSurveyRepository
 }
 
-const makeAddSurveyRepository = (): AddSurveyRepository => {
+const mockAddSurveyRepository = (): AddSurveyRepository => {
   class AddSurveyRepositoryStub implements AddSurveyRepository {
     public async add (surveyData: AddSurveyParams):Promise<void> {
       return new Promise(resolve => resolve())
@@ -16,16 +16,7 @@ const makeAddSurveyRepository = (): AddSurveyRepository => {
   return new AddSurveyRepositoryStub()
 }
 
-const makeSystemUnderTest = () :SystemUnderTestTypes => {
-  const addSurveyRepositoryStub = makeAddSurveyRepository()
-  const systemUnderTest = new DbAddSurvey(addSurveyRepositoryStub)
-  return {
-    systemUnderTest,
-    addSurveyRepositoryStub
-  }
-}
-
-const makeFakeSurveyData = (): AddSurveyParams => ({
+const mockSurveyParams = (): AddSurveyParams => ({
   question: 'any_question',
   answers: [{
     image: 'any_image',
@@ -33,6 +24,15 @@ const makeFakeSurveyData = (): AddSurveyParams => ({
   }],
   date: new Date()
 })
+
+const makeSut = () :SystemUnderTestTypes => {
+  const addSurveyRepositoryStub = mockAddSurveyRepository()
+  const sut = new DbAddSurvey(addSurveyRepositoryStub)
+  return {
+    sut,
+    addSurveyRepositoryStub
+  }
+}
 
 describe('DbAddSurvey usecase', () => {
   beforeAll(() => {
@@ -44,22 +44,17 @@ describe('DbAddSurvey usecase', () => {
   })
 
   test('Should call AddSurveyRepository with correct values', async () => {
-    const { systemUnderTest, addSurveyRepositoryStub } = makeSystemUnderTest()
+    const { sut, addSurveyRepositoryStub } = makeSut()
     const addSpy = jest.spyOn(addSurveyRepositoryStub, 'add')
-    const surveyData = makeFakeSurveyData()
-
-    await systemUnderTest.add(surveyData)
-    expect(addSpy).toHaveBeenCalledWith(surveyData)
+    await sut.add(mockSurveyParams())
+    expect(addSpy).toHaveBeenCalledWith(mockSurveyParams())
   })
 
   test('Should throw if AddSurveyRepository throws', async () => {
-    const { systemUnderTest, addSurveyRepositoryStub } = makeSystemUnderTest()
-    jest.spyOn(addSurveyRepositoryStub, 'add')
-      .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
-      )
-    const promise = systemUnderTest.add(makeFakeSurveyData())
+    const { sut, addSurveyRepositoryStub } = makeSut()
+    jest.spyOn(addSurveyRepositoryStub, 'add').mockReturnValueOnce(Promise.reject(new Error()))
 
+    const promise = sut.add(mockSurveyParams())
     await expect(promise).rejects.toThrow()
   })
 })
