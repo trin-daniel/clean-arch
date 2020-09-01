@@ -1,6 +1,17 @@
-import { signinPath } from './paths/sign-in-path'
-import { accountSchema } from './schemas/account-schema'
-import { signinSchema } from './schemas/signin-schema'
+import {
+  badRequest,
+  serverError,
+  unauthorized,
+  notFound
+} from './components'
+
+import {
+  accountSchema,
+  signinSchema,
+  errorSchema
+} from './schemas'
+
+import { signin } from './paths/sign-in-path'
 
 export const docs = {
   openapi: '3.0.0',
@@ -9,17 +20,23 @@ export const docs = {
     description: 'Api do curso do professor Mango',
     version: '1.0.0'
   },
-  servers: [{
-    url: '/api'
-  }],
-  tags: [{
-    name: 'SignIn'
-  }],
-  paths: {
-    '/signin': signinPath
+  license: {
+    name: 'GPL-3.0-or-later',
+    url: 'https://opensource.org/licenses/GPL-3.0'
   },
+  servers: [{ url: '/api' }],
+  tags: [{ name: 'SignIn' }],
+  paths: { '/signin': signin },
+
   schemas: {
     account: accountSchema,
-    signin: signinSchema
+    signin: signinSchema,
+    error: errorSchema
+  },
+  components: {
+    badRequest,
+    unauthorized,
+    serverError,
+    notFound
   }
 }
