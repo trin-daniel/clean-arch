@@ -15,10 +15,12 @@ import {
   surveysSchema,
   signupSchema,
   apiKeyAuthSchema,
-  addsurveySchema
+  addsurveySchema,
+  saveSurveySchema,
+  surveyResultSchema
 } from './schemas'
 
-import { signin, surveyPath, signup } from './paths'
+import { signin, surveyPath, signup, surveyResult } from './paths'
 
 export const docs = {
   openapi: '3.0.0',
@@ -33,7 +35,7 @@ export const docs = {
   },
   servers: [{ url: '/api' }],
   tags: [{ name: 'SignIn' }, { name: 'Survey' }],
-  paths: { '/signin': signin, '/surveys': surveyPath, '/signup': signup },
+  paths: { '/signin': signin, '/surveys': surveyPath, '/signup': signup, '/surveys/{surveyId}/results': surveyResult },
 
   schemas: {
     account: accountSchema,
@@ -43,7 +45,9 @@ export const docs = {
     error: errorSchema,
     surveys: surveysSchema,
     survey: surveySchema,
-    surveyAnswer: surveyAnswerSchema
+    surveyAnswer: surveyAnswerSchema,
+    saveSurvey: saveSurveySchema,
+    surveyResult: surveyResultSchema
   },
   components: {
     securitySchemes: {
