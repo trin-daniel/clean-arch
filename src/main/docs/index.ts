@@ -14,7 +14,8 @@ import {
   surveyAnswerSchema,
   surveysSchema,
   signupSchema,
-  apiKeyAuthSchema
+  apiKeyAuthSchema,
+  addsurveySchema
 } from './schemas'
 
 import { signin, surveyPath, signup } from './paths'
@@ -36,6 +37,7 @@ export const docs = {
 
   schemas: {
     account: accountSchema,
+    addSurvey: addsurveySchema,
     signin: signinSchema,
     signup: signupSchema,
     error: errorSchema,
