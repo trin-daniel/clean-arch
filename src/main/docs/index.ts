@@ -2,16 +2,21 @@ import {
   badRequest,
   serverError,
   unauthorized,
-  notFound
+  notFound,
+  forbidden
 } from './components'
 
 import {
   accountSchema,
   signinSchema,
-  errorSchema
+  errorSchema,
+  surveySchema,
+  surveyAnswerSchema,
+  surveysSchema,
+  apiKeyAuthSchema
 } from './schemas'
 
-import { signin } from './paths/sign-in-path'
+import { signin, surveyPath } from './paths'
 
 export const docs = {
   openapi: '3.0.0',
@@ -25,18 +30,25 @@ export const docs = {
     url: 'https://opensource.org/licenses/GPL-3.0'
   },
   servers: [{ url: '/api' }],
-  tags: [{ name: 'SignIn' }],
-  paths: { '/signin': signin },
+  tags: [{ name: 'SignIn' }, { name: 'Survey' }],
+  paths: { '/signin': signin, '/surveys': surveyPath },
 
   schemas: {
     account: accountSchema,
     signin: signinSchema,
-    error: errorSchema
+    error: errorSchema,
+    surveys: surveysSchema,
+    survey: surveySchema,
+    surveyAnswer: surveyAnswerSchema
   },
   components: {
+    securitySchemes: {
+      apiKeyAuth: apiKeyAuthSchema
+    },
     badRequest,
     unauthorized,
     serverError,
-    notFound
+    notFound,
+    forbidden
   }
 }
