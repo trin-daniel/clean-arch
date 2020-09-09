@@ -17,7 +17,8 @@ import {
   apiKeyAuthSchema,
   addsurveySchema,
   saveSurveySchema,
-  surveyResultSchema
+  surveyResultSchema,
+  surveyResultAnswerSchema
 } from './schemas'
 
 import { signin, surveyPath, signup, surveyResult } from './paths'
@@ -46,6 +47,7 @@ export const docs = {
     surveys: surveysSchema,
     survey: surveySchema,
     surveyAnswer: surveyAnswerSchema,
+    surveyResultAnswer: surveyResultAnswerSchema,
     saveSurvey: saveSurveySchema,
     surveyResult: surveyResultSchema
   },
