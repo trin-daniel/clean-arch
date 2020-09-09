@@ -20,10 +20,19 @@ const mockSurveyResult = (): SaveSurveyResultParams => ({
 })
 
 const mockSurveyResultModel = (): SurveyResultModel => ({
-  id: 'any_id',
-  accountId: 'any_account_id',
-  answer: 'any_answer',
   surveyId: 'any_survey_id',
+  question: 'any_question',
+  answers: [{
+    answer: 'any_answer',
+    image: 'any_image',
+    count: 1,
+    percent: 50
+  }, {
+    answer: 'other_answer',
+    image: 'other_image',
+    count: 2,
+    percent: 51
+  }],
   date: new Date()
 })
 
@@ -58,8 +67,8 @@ describe('DbSaveSurveyResult usecase', () => {
     const { sut, saveSurveyResultRepositoryStub } = makeSystemUnderTest()
     const saveSpy = jest.spyOn(saveSurveyResultRepositoryStub, 'save')
 
-    await sut.save(mockSurveyResultModel())
-    expect(saveSpy).toHaveBeenCalledWith(mockSurveyResultModel())
+    await sut.save(mockSurveyResult())
+    expect(saveSpy).toHaveBeenCalledWith(mockSurveyResult())
   })
 
   test('Should throw if SaveSurveyResultRepository throws', async () => {

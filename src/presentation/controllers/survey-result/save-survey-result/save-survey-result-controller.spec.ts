@@ -39,8 +39,7 @@ const mockSurvey = (): SurveyModel => ({
   date: new Date()
 })
 
-const mockSurveyResult = (): SurveyResultModel => ({
-  id: 'valid_id',
+const mockSurveyResult = (): any => ({
   surveyId: 'valid_survey_id',
   accountId: 'valid_account_id',
   answer: 'valid_answer',
