@@ -8,21 +8,18 @@ import { LoadSurveyResultRepository } from '../../../../data/protocols/db/survey
 export class SurveyResultMongoRepository implements
 SaveSurveyResultRepository,
 LoadSurveyResultRepository {
-  public async save (data: SaveSurveyResultParams):Promise<SurveyResultModel> {
+  public async save (data: SaveSurveyResultParams):Promise<void> {
     const surveyResultCollection = await MongoHelper.getCollection('surveyResults')
     await surveyResultCollection.findOneAndUpdate({
       surveyId: new ObjectId(data.surveyId),
       accountId: new ObjectId(data.accountId)
-    }, {
-      $set: {
-        answer: data.answer,
-        date: data.date
-      }
-    }, {
+    },
+    {
+      $set: { answer: data.answer, date: data.date }
+    },
+    {
       upsert: true
     })
-    const result = await this.loadBySurveyId(data.surveyId)
-    return result
   }
 
   public async loadBySurveyId (surveyId: string):Promise<SurveyResultModel> {
