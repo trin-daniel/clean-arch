@@ -1,11 +1,14 @@
-import { HttpRequest, LoadSurveyById } from './load-survey-result-controller-protocols'
+import { HttpRequest, LoadSurveyById, LoadSurveyResult } from './load-survey-result-controller-protocols'
 import { LoadSurveyResultController } from './load-survey-result-controller'
 import { SurveyModel } from '../../../../domain/models/survey'
 import { forbidden, serverError } from '../../../helpers/http/http-helper'
 import { InvalidParamErrors } from '../../../errors/'
+import { SurveyResultModel } from '../../../../domain/models/survey-result'
+
 type SutTypes = {
 sut: LoadSurveyResultController,
-loadSurveyByIdStub: LoadSurveyById
+loadSurveyByIdStub: LoadSurveyById,
+loadSurveyResultStub: LoadSurveyResult
 }
 
 const mockSurvey = (): SurveyModel => ({
@@ -31,12 +34,40 @@ const mockLoadSurveyById = (): LoadSurveyById => {
   return new LoadSurveyByIdStub()
 }
 
+const mockSurveyResultModel = (): SurveyResultModel => ({
+  surveyId: 'any_id',
+  question: 'any_question',
+  answers: [{
+    answer: 'any_answer',
+    image: 'any_image',
+    count: 0,
+    percent: 0
+  }, {
+    answer: 'other_answer',
+    image: 'other_image',
+    count: 0,
+    percent: 0
+  }],
+  date: new Date()
+})
+
+const mockLoadSurveyResult = (): LoadSurveyResult => {
+  class LoadSurveyResultStub implements LoadSurveyResult {
+    public async load (surveyId: string): Promise<SurveyResultModel> {
+      return Promise.resolve(mockSurveyResultModel())
+    }
+  }
+  return new LoadSurveyResultStub()
+}
+
 const makeSut = (): SutTypes => {
   const loadSurveyByIdStub = mockLoadSurveyById()
-  const sut = new LoadSurveyResultController(loadSurveyByIdStub)
+  const loadSurveyResultStub = mockLoadSurveyResult()
+  const sut = new LoadSurveyResultController(loadSurveyByIdStub, loadSurveyResultStub)
   return {
     sut,
-    loadSurveyByIdStub
+    loadSurveyByIdStub,
+    loadSurveyResultStub
   }
 }
 
@@ -63,5 +94,13 @@ describe('LoadSurveyResult Controller', () => {
     const response = await sut.handle(mockRequest())
 
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should call LoadSurveyResult with correct value', async () => {
+    const { sut, loadSurveyResultStub } = makeSut()
+    const loadSpy = jest.spyOn(loadSurveyResultStub, 'load')
+    await sut.handle(mockRequest())
+
+    expect(loadSpy).toHaveBeenCalledWith('any_id')
   })
 })
