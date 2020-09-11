@@ -1,3 +1,5 @@
+import { forbidden } from '../../../helpers/http/http-helper'
+import { InvalidParamErrors } from '../../../errors'
 import {
   Controller,
   HttpRequest,
@@ -11,7 +13,10 @@ export class LoadSurveyResultController implements Controller {
   ) {}
 
   public async handle (req: HttpRequest): Promise<HttpResponse> {
-    await this.loadSurveyById.loadById(req.params.surveyId)
+    const survey = await this.loadSurveyById.loadById(req.params.surveyId)
+    if (!survey) {
+      return forbidden(new InvalidParamErrors('surveyId'))
+    }
     return null
   }
 }
