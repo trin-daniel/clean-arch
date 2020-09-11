@@ -59,4 +59,11 @@ describe('DbLoadSurveyResult usecase', () => {
     const promise = sut.load('any_survey_id')
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return SurveyResultModel on success', async () => {
+    const { sut } = makeSut()
+    const response = await sut.load('any_survey_id')
+
+    expect(response).toEqual(mockSurveyResultModel())
+  })
 })
