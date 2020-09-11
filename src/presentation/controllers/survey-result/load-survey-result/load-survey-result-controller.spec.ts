@@ -1,7 +1,7 @@
 import { HttpRequest, LoadSurveyById, LoadSurveyResult } from './load-survey-result-controller-protocols'
 import { LoadSurveyResultController } from './load-survey-result-controller'
 import { SurveyModel } from '../../../../domain/models/survey'
-import { forbidden, serverError } from '../../../helpers/http/http-helper'
+import { forbidden, serverError, success } from '../../../helpers/http/http-helper'
 import { InvalidParamErrors } from '../../../errors/'
 import { SurveyResultModel } from '../../../../domain/models/survey-result'
 
@@ -110,5 +110,12 @@ describe('LoadSurveyResult Controller', () => {
     const response = await sut.handle(mockRequest())
 
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should return 200 on success', async () => {
+    const { sut } = makeSut()
+    const response = await sut.handle(mockRequest())
+
+    expect(response).toEqual(success(mockSurveyResultModel()))
   })
 })
