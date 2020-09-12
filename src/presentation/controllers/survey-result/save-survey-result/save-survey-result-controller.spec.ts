@@ -5,12 +5,12 @@ import {
   SurveyResultModel,
   SaveSurveyResult,
   SaveSurveyResultParams
-} from './save-survey-result-controller-protocols'
+} from '@presentation/controllers/survey-result/save-survey-result/save-survey-result-controller-protocols'
 
-import { SaveSurveyResultController } from './save-survey-result-controller'
-import { forbidden, serverError, success } from '../../../helpers/http/http-helper'
+import { SaveSurveyResultController } from '@presentation/controllers/survey-result/save-survey-result/save-survey-result-controller'
+import { forbidden, serverError, success } from '@presentation/helpers/http/http-helper'
 
-import { InvalidParamErrors } from '../../../errors'
+import { InvalidParamErrors } from '@presentation/errors'
 import { set, reset } from 'mockdate'
 
 type SutTypes = {

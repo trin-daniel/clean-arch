@@ -1,6 +1,6 @@
-import { MongoHelper } from '../helpers/mongo-helper'
-import { SurveyMongoRepository } from './survey-mongo-repository'
-import { AddSurveyParams } from '../../../../domain/usecases/survey/add-survey'
+import { AddSurveyParams } from '@domain/usecases/survey/add-survey'
+import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
+import { SurveyMongoRepository } from '@infra/db/mongodb/survey/survey-mongo-repository'
 import { Collection } from 'mongodb'
 
 const makeSystemUnderTest = ():SurveyMongoRepository => {

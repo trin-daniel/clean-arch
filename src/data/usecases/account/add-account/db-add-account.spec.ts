@@ -6,7 +6,7 @@ import {
   Hasher
 } from './db-add-account-protocols'
 
-import { DbAddAccount } from '../add-account/db-add-account'
+import { DbAddAccount } from '@data/usecases/account/add-account/db-add-account'
 
 type SutTypes = {
   sut: DbAddAccount,

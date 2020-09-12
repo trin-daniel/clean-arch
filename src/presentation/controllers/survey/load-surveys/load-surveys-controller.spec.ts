@@ -2,10 +2,10 @@ import {
   success,
   serverError,
   noContent
-} from '../../../helpers/http/http-helper'
+} from '@presentation/helpers/http/http-helper'
 
-import { SurveyModel, LoadSurveys } from './load-surveys-controller-protocols'
-import { LoadSurveysController } from './load-surveys-controller'
+import { SurveyModel, LoadSurveys } from '@presentation/controllers/survey/load-surveys/load-surveys-controller-protocols'
+import { LoadSurveysController } from '@presentation/controllers/survey/load-surveys/load-surveys-controller'
 
 import { set, reset } from 'mockdate'
 

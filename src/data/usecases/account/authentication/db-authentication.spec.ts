@@ -5,9 +5,9 @@ import {
   HashComparer,
   Encrypter,
   UpdateAccessTokenRepository
-} from './db-authentication-protocols'
+} from '@data/usecases/account/authentication/db-authentication-protocols'
 
-import { DbAuthentication } from './db-authentication'
+import { DbAuthentication } from '@data/usecases/account/authentication/db-authentication'
 
 type SutTypes = {
   sut: DbAuthentication,

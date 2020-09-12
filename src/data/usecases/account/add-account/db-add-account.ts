@@ -6,7 +6,7 @@ import
   AddAccountRepository,
   Hasher
 } from './db-add-account-protocols'
-import { LoadAccountByEmailRepository } from '../authentication/db-authentication-protocols'
+import { LoadAccountByEmailRepository } from '@data/usecases/account/authentication/db-authentication-protocols'
 
 export class DbAddAccount implements AddAccount {
   constructor (

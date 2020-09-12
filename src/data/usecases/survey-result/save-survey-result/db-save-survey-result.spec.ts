@@ -3,9 +3,9 @@ import {
   SaveSurveyResultRepository,
   SurveyResultModel,
   LoadSurveyResultRepository
-} from './db-save-survey-result-protocols'
+} from '@data/usecases/survey-result/save-survey-result/db-save-survey-result-protocols'
 
-import { DbSaveSurveyResult } from './db-save-survey-result'
+import { DbSaveSurveyResult } from '@data/usecases/survey-result/save-survey-result/db-save-survey-result'
 import { set, reset } from 'mockdate'
 
 type SutTypes = {

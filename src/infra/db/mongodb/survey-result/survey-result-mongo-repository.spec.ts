@@ -1,7 +1,7 @@
-import { MongoHelper } from '../helpers/mongo-helper'
-import { SurveyResultMongoRepository } from './survey-result-mongo-respository'
-import { AccountModel } from '../../../../domain/models/account'
-import { SurveyModel } from '../../../../domain/models/survey'
+import { AccountModel } from '@domain/models/account'
+import { SurveyModel } from '@domain/models/survey'
+import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
+import { SurveyResultMongoRepository } from '@infra/db/mongodb/survey-result/survey-result-mongo-respository'
 import { Collection, ObjectId } from 'mongodb'
 import { set, reset } from 'mockdate'
 

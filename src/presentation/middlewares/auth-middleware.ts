@@ -3,13 +3,13 @@ import {
   HttpRequest,
   HttpResponse,
   Middleware
-} from './auth-middleware-protocols'
+} from '@presentation/middlewares/auth-middleware-protocols'
 
 import {
   forbidden,
   success,
   serverError
-} from '../helpers/http/http-helper'
+} from '@presentation/helpers/http/http-helper'
 
 import { AccessDeniedError } from '../errors'
 

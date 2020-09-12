@@ -4,7 +4,7 @@ import {
   unauthorized,
   notFound,
   forbidden
-} from './components'
+} from '@main/docs/components'
 
 import {
   accountSchema,
@@ -19,9 +19,9 @@ import {
   saveSurveySchema,
   surveyResultSchema,
   surveyResultAnswerSchema
-} from './schemas'
+} from '@main/docs/schemas'
 
-import { signin, surveyPath, signup, surveyResult } from './paths'
+import { signin, surveyPath, signup, surveyResult } from '@main/docs/paths'
 
 export const docs = {
   openapi: '3.0.0',

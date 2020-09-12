@@ -8,13 +8,18 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "paths": {
+      "@domain/*":["domain/*"],
+      "@presentation/*":["presentation/*"],
+      "@data/*":["data/*"],
+      "@infra/*":["infra/*"],
+      "@validation/*":["validation/*"],
+      "@main/*":["main/*"]
+    }
   },
   "include": [
     "src"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
   ]
 }

@@ -1,9 +1,9 @@
 import { reset, set } from 'mockdate'
-import { SurveyModel } from '../../../../domain/models/survey'
-import { SurveyResultModel } from '../../../../domain/models/survey-result'
-import { LoadSurveyResultRepository } from '../../../protocols/db/survey-result/load-survey-result-repository'
-import { LoadSurveyByIdRepository } from '../../../protocols/db/survey/load-survey-by-id-repository'
-import { DbLoadSurveyResult } from './db-load-survey-result'
+import { SurveyModel } from '@domain/models/survey'
+import { SurveyResultModel } from '@domain/models/survey-result'
+import { LoadSurveyResultRepository } from '@data/protocols/db/survey-result/load-survey-result-repository'
+import { LoadSurveyByIdRepository } from '@data/protocols/db/survey/load-survey-by-id-repository'
+import { DbLoadSurveyResult } from '@data/usecases/survey-result/load-survey-result/db-load-survey-result'
 
 type SutTypes = {
 sut: DbLoadSurveyResult,

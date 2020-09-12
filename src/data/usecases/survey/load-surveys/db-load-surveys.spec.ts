@@ -1,5 +1,5 @@
-import { LoadSurveysRepository, SurveyModel } from './db-load-surveys-protocols'
-import { DbLoadSurveys } from './db-load-surveys'
+import { LoadSurveysRepository, SurveyModel } from '@data/usecases/survey/load-surveys/db-load-surveys-protocols'
+import { DbLoadSurveys } from '@data/usecases/survey/load-surveys/db-load-surveys'
 
 import { set, reset } from 'mockdate'
 

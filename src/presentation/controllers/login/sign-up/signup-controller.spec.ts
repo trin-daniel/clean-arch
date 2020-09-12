@@ -5,23 +5,23 @@ import {
   Validation,
   Authentication,
   AuthenticationParams
-} from './signup-controller-protocols'
+} from '@presentation/controllers/login/sign-up/signup-controller-protocols'
 
 import {
   success,
   serverError,
   badRequest,
   forbidden
-} from '../../../helpers/http/http-helper'
+} from '@presentation/helpers/http/http-helper'
 
 import {
   MissingParamError,
   ServerError,
   EmailInUseError
-} from '../../../errors'
+} from '@presentation/errors'
 
-import { HttpRequest } from '../../../protocols'
-import { SignUpController } from './signup-controller'
+import { HttpRequest } from '@presentation/protocols'
+import { SignUpController } from '@presentation/controllers/login/sign-up/signup-controller'
 
 type SutTypes = {
   sut: SignUpController,

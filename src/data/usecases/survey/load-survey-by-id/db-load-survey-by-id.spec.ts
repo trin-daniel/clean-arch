@@ -1,5 +1,5 @@
-import { LoadSurveyByIdRepository, SurveyModel } from './db-load-survey-by-id-protocols'
-import { DbLoadSurveyById } from './db-load-survey-by-id'
+import { LoadSurveyByIdRepository, SurveyModel } from '@data/usecases/survey/load-survey-by-id/db-load-survey-by-id-protocols'
+import { DbLoadSurveyById } from '@data/usecases/survey/load-survey-by-id/db-load-survey-by-id'
 import { set, reset } from 'mockdate'
 
 type SystemUnderTestTypes = {

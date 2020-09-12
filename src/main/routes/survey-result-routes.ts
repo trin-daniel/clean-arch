@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { authUser } from '../middlewares/auth-user'
-import { ExpressRouteAdapter } from '../adapters/express-route-adapter'
-import { makeSaveSurveyResultController } from '../factories/controllers/survey-result/save-survey-result/save-survey-result-controller-factory'
-import { makeLoadSurveyResultController } from '../factories/controllers/survey-result/load-survey-result/load-survey-result-controller-factory'
+import { authUser } from '@main//middlewares/auth-user'
+import { ExpressRouteAdapter } from '@main/adapters/express-route-adapter'
+import { makeSaveSurveyResultController } from '@main/factories/controllers/survey-result/save-survey-result/save-survey-result-controller-factory'
+import { makeLoadSurveyResultController } from '@main/factories/controllers/survey-result/load-survey-result/load-survey-result-controller-factory'
 
 export default (router: Router): void => {
   router.put('/surveys/:surveyId/results', authUser, ExpressRouteAdapter(makeSaveSurveyResultController()))

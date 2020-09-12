@@ -4,15 +4,15 @@ import {
   HttpRequest,
   LoadSurveyById,
   SaveSurveyResult
-} from './save-survey-result-controller-protocols'
+} from '@presentation/controllers/survey-result/save-survey-result/save-survey-result-controller-protocols'
 
 import {
   forbidden,
   serverError,
   success
-} from '../../../helpers/http/http-helper'
+} from '@presentation/helpers/http/http-helper'
 
-import { InvalidParamErrors } from '../../../errors'
+import { InvalidParamErrors } from '@presentation/errors'
 
 export class SaveSurveyResultController implements Controller {
   constructor (

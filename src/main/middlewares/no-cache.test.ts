@@ -1,5 +1,5 @@
-import { noCache } from './no-cache'
-import app from '../config/app'
+import { noCache } from '@main/middlewares/no-cache'
+import app from '@main/config/app'
 import request from 'supertest'
 
 describe('NoCache Middleware', () => {

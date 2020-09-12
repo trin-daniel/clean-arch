@@ -3,15 +3,15 @@ import {
   AddSurveyParams,
   HttpRequest,
   Validation
-} from './add-survey-controller-protocols'
+} from '@presentation/controllers/survey/add-survey/add-survey-controller-protocols'
 
 import {
   badRequest,
   serverError,
   noContent
-} from '../../../helpers/http/http-helper'
+} from '@presentation/helpers/http/http-helper'
 
-import { AddSurveyController } from './add-survey-controller'
+import { AddSurveyController } from '@presentation/controllers/survey/add-survey/add-survey-controller'
 
 import { set, reset } from 'mockdate'
 

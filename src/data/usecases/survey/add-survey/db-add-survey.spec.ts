@@ -1,6 +1,6 @@
 import { set, reset } from 'mockdate'
-import { AddSurveyParams, AddSurveyRepository } from './db-add-survey-protocols'
-import { DbAddSurvey } from './db-add-survey'
+import { AddSurveyParams, AddSurveyRepository } from '@data/usecases/survey/add-survey/db-add-survey-protocols'
+import { DbAddSurvey } from '@data/usecases/survey/add-survey/db-add-survey'
 
 type SystemUnderTestTypes = {
   sut: DbAddSurvey

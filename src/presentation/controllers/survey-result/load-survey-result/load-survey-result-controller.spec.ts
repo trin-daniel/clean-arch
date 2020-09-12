@@ -1,9 +1,9 @@
-import { HttpRequest, LoadSurveyById, LoadSurveyResult } from './load-survey-result-controller-protocols'
-import { LoadSurveyResultController } from './load-survey-result-controller'
-import { SurveyModel } from '../../../../domain/models/survey'
-import { forbidden, serverError, success } from '../../../helpers/http/http-helper'
-import { InvalidParamErrors } from '../../../errors/'
-import { SurveyResultModel } from '../../../../domain/models/survey-result'
+import { SurveyModel } from '@domain/models/survey'
+import { SurveyResultModel } from '@domain/models/survey-result'
+import { HttpRequest, LoadSurveyById, LoadSurveyResult } from '@presentation/controllers/survey-result/load-survey-result/load-survey-result-controller-protocols'
+import { LoadSurveyResultController } from '@presentation/controllers/survey-result/load-survey-result/load-survey-result-controller'
+import { forbidden, serverError, success } from '@presentation/helpers/http/http-helper'
+import { InvalidParamErrors } from '@presentation/errors/'
 import { reset, set } from 'mockdate'
 
 type SutTypes = {
