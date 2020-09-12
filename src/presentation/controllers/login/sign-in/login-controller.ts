@@ -1,13 +1,24 @@
-import { Authentication, Controller, HttpRequest, HttpResponse, Validation } from '@presentation/controllers/login/sign-in/login-controller-protocols'
-import { badRequest, serverError, unauthorized, success } from '@presentation/helpers/http/http-helper'
+import {
+  Authentication,
+  Controller,
+  HttpRequest,
+  HttpResponse,
+  Validation,
+} from '@presentation/controllers/login/sign-in/login-controller-protocols'
+import {
+  badRequest,
+  serverError,
+  success,
+  unauthorized,
+} from '@presentation/helpers/http/http-helper'
 
 export class LoginController implements Controller {
-  constructor (
+  constructor(
     private readonly authentication: Authentication,
-    private readonly validation: Validation
+    private readonly validation: Validation,
   ) {}
 
-  public async handle (request:HttpRequest): Promise<HttpResponse> {
+  public async handle(request: HttpRequest): Promise<HttpResponse> {
     try {
       const error = this.validation.validate(request.body)
       if (error) {

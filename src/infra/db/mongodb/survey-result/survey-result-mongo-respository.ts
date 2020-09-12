@@ -1,53 +1,59 @@
-import { SaveSurveyResultParams } from '@domain/usecases/survey-result/save-survey-result'
-import { SurveyResultModel } from '@domain/models/survey-result'
-import { SaveSurveyResultRepository } from '@data/protocols/db/survey-result/save-survey-result-repository'
-import { LoadSurveyResultRepository } from '@data/protocols/db/survey-result/load-survey-result-repository'
 import { MongoHelper, QueryBuilder } from '@infra/db/mongodb/helpers'
-import { ObjectId } from 'mongodb'
 
-export class SurveyResultMongoRepository implements
-SaveSurveyResultRepository,
-LoadSurveyResultRepository {
-  public async save (data: SaveSurveyResultParams):Promise<void> {
-    const surveyResultCollection = await MongoHelper.getCollection('surveyResults')
-    await surveyResultCollection.findOneAndUpdate({
-      surveyId: new ObjectId(data.surveyId),
-      accountId: new ObjectId(data.accountId)
-    },
-    {
-      $set: { answer: data.answer, date: data.date }
-    },
-    {
-      upsert: true
-    })
+import { LoadSurveyResultRepository } from '@data/protocols/db/survey-result/load-survey-result-repository'
+import { ObjectId } from 'mongodb'
+import { SaveSurveyResultParams } from '@domain/usecases/survey-result/save-survey-result'
+import { SaveSurveyResultRepository } from '@data/protocols/db/survey-result/save-survey-result-repository'
+import { SurveyResultModel } from '@domain/models/survey-result'
+
+export class SurveyResultMongoRepository
+  implements SaveSurveyResultRepository, LoadSurveyResultRepository {
+  public async save(data: SaveSurveyResultParams): Promise<void> {
+    const surveyResultCollection = await MongoHelper.getCollection(
+      'surveyResults',
+    )
+    await surveyResultCollection.findOneAndUpdate(
+      {
+        surveyId: new ObjectId(data.surveyId),
+        accountId: new ObjectId(data.accountId),
+      },
+      {
+        $set: { answer: data.answer, date: data.date },
+      },
+      {
+        upsert: true,
+      },
+    )
   }
 
-  public async loadBySurveyId (surveyId: string):Promise<SurveyResultModel> {
-    const surveyResultCollection = await MongoHelper.getCollection('surveyResults')
+  public async loadBySurveyId(surveyId: string): Promise<SurveyResultModel> {
+    const surveyResultCollection = await MongoHelper.getCollection(
+      'surveyResults',
+    )
     const query = new QueryBuilder()
       .match({
-        surveyId: new ObjectId(surveyId)
+        surveyId: new ObjectId(surveyId),
       })
       .group({
         _id: 0,
         data: {
-          $push: '$$ROOT'
+          $push: '$$ROOT',
         },
         total: {
-          $sum: 1
-        }
+          $sum: 1,
+        },
       })
       .unwind({
-        path: '$data'
+        path: '$data',
       })
       .lookup({
         from: 'surveys',
         foreignField: '_id',
         localField: 'data.surveyId',
-        as: 'survey'
+        as: 'survey',
       })
       .unwind({
-        path: '$survey'
+        path: '$survey',
       })
       .group({
         _id: {
@@ -56,11 +62,11 @@ LoadSurveyResultRepository {
           date: '$survey.date',
           total: '$total',
           answer: '$data.answer',
-          answers: '$survey.answers'
+          answers: '$survey.answers',
         },
         count: {
-          $sum: 1
-        }
+          $sum: 1,
+        },
       })
       .project({
         _id: 0,
@@ -72,43 +78,49 @@ LoadSurveyResultRepository {
             input: '$_id.answers',
             as: 'item',
             in: {
-              $mergeObjects: ['$$item', {
-                count: {
-                  $cond: {
-                    if: {
-                      $eq: ['$$item.answer', '$_id.answer']
+              $mergeObjects: [
+                '$$item',
+                {
+                  count: {
+                    $cond: {
+                      if: {
+                        $eq: ['$$item.answer', '$_id.answer'],
+                      },
+                      then: '$count',
+                      else: 0,
                     },
-                    then: '$count',
-                    else: 0
-                  }
+                  },
+                  percent: {
+                    $cond: {
+                      if: {
+                        $eq: ['$$item.answer', '$_id.answer'],
+                      },
+                      then: {
+                        $multiply: [
+                          {
+                            $divide: ['$count', '$_id.total'],
+                          },
+                          100,
+                        ],
+                      },
+                      else: 0,
+                    },
+                  },
                 },
-                percent: {
-                  $cond: {
-                    if: {
-                      $eq: ['$$item.answer', '$_id.answer']
-                    },
-                    then: {
-                      $multiply: [{
-                        $divide: ['$count', '$_id.total']
-                      }, 100]
-                    },
-                    else: 0
-                  }
-                }
-              }]
-            }
-          }
-        }
+              ],
+            },
+          },
+        },
       })
       .group({
         _id: {
           surveyId: '$surveyId',
           question: '$question',
-          date: '$date'
+          date: '$date',
         },
         answers: {
-          $push: '$answers'
-        }
+          $push: '$answers',
+        },
       })
       .project({
         _id: 0,
@@ -120,13 +132,13 @@ LoadSurveyResultRepository {
             input: '$answers',
             initialValue: [],
             in: {
-              $concatArrays: ['$$value', '$$this']
-            }
-          }
-        }
+              $concatArrays: ['$$value', '$$this'],
+            },
+          },
+        },
       })
       .unwind({
-        path: '$answers'
+        path: '$answers',
       })
       .group({
         _id: {
@@ -134,14 +146,14 @@ LoadSurveyResultRepository {
           question: '$question',
           date: '$date',
           answer: '$answers.answer',
-          image: '$answers.image'
+          image: '$answers.image',
         },
         count: {
-          $sum: '$answers.count'
+          $sum: '$answers.count',
         },
         percent: {
-          $sum: '$answers.percent'
-        }
+          $sum: '$answers.percent',
+        },
       })
       .project({
         _id: 0,
@@ -152,28 +164,28 @@ LoadSurveyResultRepository {
           answer: '$_id.answer',
           image: '$_id.image',
           count: '$count',
-          percent: '$percent'
-        }
+          percent: '$percent',
+        },
       })
       .sort({
-        'answer.count': -1
+        'answer.count': -1,
       })
       .group({
         _id: {
           surveyId: '$surveyId',
           question: '$question',
-          date: '$date'
+          date: '$date',
         },
         answers: {
-          $push: '$answer'
-        }
+          $push: '$answer',
+        },
       })
       .project({
         _id: 0,
         surveyId: '$_id.surveyId',
         question: '$_id.question',
         date: '$_id.date',
-        answers: '$answers'
+        answers: '$answers',
       })
       .build()
     const result = await surveyResultCollection.aggregate(query).toArray()

@@ -1,6 +1,6 @@
-import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
 import { AccountMongoRepository } from '@infra/db/mongodb/account/account-mongo-repository'
 import { Collection } from 'mongodb'
+import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
 
 let accountCollection: Collection
 describe('Account mongo repository', () => {
@@ -26,7 +26,7 @@ describe('Account mongo repository', () => {
       const account = await systemUnderTest.add({
         name: 'any_name',
         email: 'any_email@gmail.com',
-        password: 'any_password'
+        password: 'any_password',
       })
       expect(account).toBeTruthy()
       expect(account.id).toBeTruthy()
@@ -42,7 +42,7 @@ describe('Account mongo repository', () => {
       await accountCollection.insertOne({
         name: 'any_name',
         email: 'any_email@gmail.com',
-        password: 'any_password'
+        password: 'any_password',
       })
       const account = await sut.loadByEmail('any_email@gmail.com')
       expect(account).toBeTruthy()
@@ -65,7 +65,7 @@ describe('Account mongo repository', () => {
       const result = await accountCollection.insertOne({
         name: 'any_name',
         email: 'any_email@gmail.com',
-        password: 'any_password'
+        password: 'any_password',
       })
       const fakeAccount = result.ops[0]
       expect(fakeAccount.accessToken).toBeFalsy()
@@ -84,7 +84,7 @@ describe('Account mongo repository', () => {
         name: 'any_name',
         email: 'any_email@gmail.com',
         password: 'any_password',
-        accessToken: 'any_token'
+        accessToken: 'any_token',
       })
       const account = await sut.loadByToken('any_token')
       expect(account).toBeTruthy()
@@ -101,7 +101,7 @@ describe('Account mongo repository', () => {
         email: 'any_email@gmail.com',
         password: 'any_password',
         accessToken: 'any_token',
-        role: 'admin'
+        role: 'admin',
       })
       const account = await sut.loadByToken('any_token', 'admin')
       expect(account).toBeTruthy()
@@ -117,7 +117,7 @@ describe('Account mongo repository', () => {
         name: 'any_name',
         email: 'any_email@gmail.com',
         password: 'any_password',
-        accessToken: 'any_token'
+        accessToken: 'any_token',
       })
       const account = await sut.loadByToken('any_token', 'admin')
       expect(account).toBeFalsy()
@@ -130,7 +130,7 @@ describe('Account mongo repository', () => {
         email: 'any_email@gmail.com',
         password: 'any_password',
         accessToken: 'any_token',
-        role: 'admin'
+        role: 'admin',
       })
       const account = await sut.loadByToken('any_token')
       expect(account).toBeTruthy()

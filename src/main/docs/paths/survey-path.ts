@@ -1,8 +1,10 @@
 export const surveyPath = {
   get: {
-    security: [{
-      apiKeyAuth: new Array<string>()
-    }],
+    security: [
+      {
+        apiKeyAuth: new Array<string>(),
+      },
+    ],
     tags: ['Survey'],
     summary: 'API de listagem de enquetes',
     responses: {
@@ -11,50 +13,52 @@ export const surveyPath = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/schemas/surveys'
-            }
-          }
-        }
+              $ref: '#/schemas/surveys',
+            },
+          },
+        },
       },
       403: {
-        $ref: '#/components/forbidden'
+        $ref: '#/components/forbidden',
       },
       404: {
-        $ref: '#/components/notFound'
+        $ref: '#/components/notFound',
       },
       500: {
-        $ref: '#/components/serverError'
-      }
-    }
+        $ref: '#/components/serverError',
+      },
+    },
   },
   post: {
-    security: [{
-      apiKeyAuth: new Array<string>()
-    }],
+    security: [
+      {
+        apiKeyAuth: new Array<string>(),
+      },
+    ],
     tags: ['Survey'],
     summary: 'API para criar uma enquete',
     requestBody: {
       content: {
         'application/json': {
           schema: {
-            $ref: '#/schemas/addSurvey'
-          }
-        }
-      }
+            $ref: '#/schemas/addSurvey',
+          },
+        },
+      },
     },
     responses: {
       204: {
-        description: 'Sucesso'
+        description: 'Sucesso',
       },
       403: {
-        $ref: '#/components/forbidden'
+        $ref: '#/components/forbidden',
       },
       404: {
-        $ref: '#/components/notFound'
+        $ref: '#/components/notFound',
       },
       500: {
-        $ref: '#/components/serverError'
-      }
-    }
-  }
+        $ref: '#/components/serverError',
+      },
+    },
+  },
 }

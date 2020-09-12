@@ -1,5 +1,9 @@
-import { set, reset } from 'mockdate'
-import { AddSurveyParams, AddSurveyRepository } from '@data/usecases/survey/add-survey/db-add-survey-protocols'
+import {
+  AddSurveyParams,
+  AddSurveyRepository,
+} from '@data/usecases/survey/add-survey/db-add-survey-protocols'
+import { reset, set } from 'mockdate'
+
 import { DbAddSurvey } from '@data/usecases/survey/add-survey/db-add-survey'
 
 type SystemUnderTestTypes = {
@@ -9,8 +13,8 @@ type SystemUnderTestTypes = {
 
 const mockAddSurveyRepository = (): AddSurveyRepository => {
   class AddSurveyRepositoryStub implements AddSurveyRepository {
-    public async add (surveyData: AddSurveyParams):Promise<void> {
-      return new Promise(resolve => resolve())
+    public async add(surveyData: AddSurveyParams): Promise<void> {
+      return new Promise((resolve) => resolve())
     }
   }
   return new AddSurveyRepositoryStub()
@@ -18,19 +22,21 @@ const mockAddSurveyRepository = (): AddSurveyRepository => {
 
 const mockSurveyParams = (): AddSurveyParams => ({
   question: 'any_question',
-  answers: [{
-    image: 'any_image',
-    answer: 'any_answer'
-  }],
-  date: new Date()
+  answers: [
+    {
+      image: 'any_image',
+      answer: 'any_answer',
+    },
+  ],
+  date: new Date(),
 })
 
-const makeSut = () :SystemUnderTestTypes => {
+const makeSut = (): SystemUnderTestTypes => {
   const addSurveyRepositoryStub = mockAddSurveyRepository()
   const sut = new DbAddSurvey(addSurveyRepositoryStub)
   return {
     sut,
-    addSurveyRepositoryStub
+    addSurveyRepositoryStub,
   }
 }
 
@@ -52,7 +58,9 @@ describe('DbAddSurvey usecase', () => {
 
   test('Should throw if AddSurveyRepository throws', async () => {
     const { sut, addSurveyRepositoryStub } = makeSut()
-    jest.spyOn(addSurveyRepositoryStub, 'add').mockReturnValueOnce(Promise.reject(new Error()))
+    jest
+      .spyOn(addSurveyRepositoryStub, 'add')
+      .mockReturnValueOnce(Promise.reject(new Error()))
 
     const promise = sut.add(mockSurveyParams())
     await expect(promise).rejects.toThrow()

@@ -1,6 +1,6 @@
-import app from '@main/config/app'
-import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
 import { Collection } from 'mongodb'
+import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
+import app from '@main/config/app'
 import { hash } from 'bcrypt'
 import request from 'supertest'
 
@@ -26,7 +26,7 @@ describe('Authentication Routes', () => {
           name: 'valid_name',
           email: 'valid_email@gmail.com',
           password: 'valid_password',
-          confirmation: 'valid_password'
+          confirmation: 'valid_password',
         })
         .expect(200)
     })
@@ -38,13 +38,13 @@ describe('Authentication Routes', () => {
       await accountCollection.insertOne({
         name: 'valid_name',
         email: 'valid_email@gmail.com',
-        password
+        password,
       })
       await request(app)
         .post('/api/signin')
         .send({
           email: 'valid_email@gmail.com',
-          password: '123'
+          password: '123',
         })
         .expect(200)
     })
@@ -53,7 +53,7 @@ describe('Authentication Routes', () => {
         .post('/api/signin')
         .send({
           email: 'valid_email@gmail.com',
-          password: '123'
+          password: '123',
         })
         .expect(401)
     })

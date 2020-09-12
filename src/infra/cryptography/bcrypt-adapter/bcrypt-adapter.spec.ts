@@ -1,18 +1,18 @@
-import bcrypt from 'bcrypt'
 import { BcryptAdapter } from '@infra/cryptography/bcrypt-adapter/bcrypt-adapter'
+import bcrypt from 'bcrypt'
 
 jest.mock('bcrypt', () => ({
-  async hash (): Promise<string> {
+  async hash(): Promise<string> {
     return Promise.resolve('hash_final')
   },
-  async compare ():Promise<boolean> {
+  async compare(): Promise<boolean> {
     return Promise.resolve(true)
-  }
+  },
 }))
 
 const salt = 12
 
-const makeSut = ():BcryptAdapter => {
+const makeSut = (): BcryptAdapter => {
   return new BcryptAdapter(salt)
 }
 
@@ -34,7 +34,9 @@ describe('Cryptographic password layer', () => {
 
     test('Should throw if hash throws', async () => {
       const sut = makeSut()
-      jest.spyOn(bcrypt, 'hash').mockReturnValueOnce(Promise.reject(new Error()))
+      jest
+        .spyOn(bcrypt, 'hash')
+        .mockReturnValueOnce(Promise.reject(new Error()))
 
       const promise = sut.hash('any_value')
       await expect(promise).rejects.toThrow()
@@ -66,7 +68,9 @@ describe('Cryptographic password layer', () => {
 
     test('Should throw if compare throws', async () => {
       const sut = makeSut()
-      jest.spyOn(bcrypt, 'compare').mockReturnValueOnce(Promise.reject(new Error()))
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockReturnValueOnce(Promise.reject(new Error()))
 
       const promise = sut.compare('any_value', 'any_hash')
       await expect(promise).rejects.toThrow()

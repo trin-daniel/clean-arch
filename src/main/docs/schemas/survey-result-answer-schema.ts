@@ -3,17 +3,17 @@ export const surveyResultAnswerSchema = {
 
   properties: {
     image: {
-      type: 'string'
+      type: 'string',
     },
     answer: {
-      type: 'string'
+      type: 'string',
     },
     count: {
-      type: 'number'
+      type: 'number',
     },
     percent: {
-      type: 'number'
-    }
+      type: 'number',
+    },
   },
-  required: ['answer', 'count', 'percent']
+  required: ['answer', 'count', 'percent'],
 }

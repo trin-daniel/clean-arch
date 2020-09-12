@@ -1,5 +1,5 @@
 export class UnauthorizedError extends Error {
-  constructor () {
+  constructor() {
     super()
     this.message = 'Unauthorized'
   }

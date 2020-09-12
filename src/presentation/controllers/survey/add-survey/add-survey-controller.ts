@@ -1,13 +1,23 @@
-import { Controller, HttpResponse, HttpRequest, Validation, AddSurvey } from '@presentation/controllers/survey/add-survey/add-survey-controller-protocols'
-import { badRequest, serverError, noContent } from '@presentation/helpers/http/http-helper'
+import {
+  AddSurvey,
+  Controller,
+  HttpRequest,
+  HttpResponse,
+  Validation,
+} from '@presentation/controllers/survey/add-survey/add-survey-controller-protocols'
+import {
+  badRequest,
+  noContent,
+  serverError,
+} from '@presentation/helpers/http/http-helper'
 
 export class AddSurveyController implements Controller {
-  constructor (
+  constructor(
     private readonly validation: Validation,
-    private readonly addSurvey: AddSurvey
+    private readonly addSurvey: AddSurvey,
   ) {}
 
-  public async handle (request: HttpRequest):Promise<HttpResponse> {
+  public async handle(request: HttpRequest): Promise<HttpResponse> {
     try {
       const error = this.validation.validate(request.body)
       if (error) {

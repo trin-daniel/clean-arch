@@ -2,13 +2,13 @@ export const addsurveySchema = {
   type: 'object',
   properties: {
     question: {
-      type: 'string'
+      type: 'string',
     },
     answers: {
       type: 'array',
       items: {
-        $ref: '#/schemas/surveyAnswer'
-      }
-    }
-  }
+        $ref: '#/schemas/surveyAnswer',
+      },
+    },
+  },
 }

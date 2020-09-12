@@ -1,37 +1,43 @@
-import { LoadSurveyByIdRepository, SurveyModel } from '@data/usecases/survey/load-survey-by-id/db-load-survey-by-id-protocols'
+import {
+  LoadSurveyByIdRepository,
+  SurveyModel,
+} from '@data/usecases/survey/load-survey-by-id/db-load-survey-by-id-protocols'
+import { reset, set } from 'mockdate'
+
 import { DbLoadSurveyById } from '@data/usecases/survey/load-survey-by-id/db-load-survey-by-id'
-import { set, reset } from 'mockdate'
 
 type SystemUnderTestTypes = {
-  systemUnderTest: DbLoadSurveyById,
+  systemUnderTest: DbLoadSurveyById
   loadSurveyByIdRepositoryStub: LoadSurveyByIdRepository
 }
 
 const makeFakeSurvey = (): SurveyModel => ({
   id: 'any_id',
   question: 'any_question',
-  answers: [{
-    answer: 'any_answer',
-    image: 'any_image'
-  }],
-  date: new Date()
+  answers: [
+    {
+      answer: 'any_answer',
+      image: 'any_image',
+    },
+  ],
+  date: new Date(),
 })
 
 const makeLoadSurveyByIdRepository = (): LoadSurveyByIdRepository => {
   class LoadSurveyByIdRepositoryStub implements LoadSurveyByIdRepository {
-    async loadById (id: string):Promise<SurveyModel> {
-      return new Promise(resolve => resolve(makeFakeSurvey()))
+    async loadById(id: string): Promise<SurveyModel> {
+      return new Promise((resolve) => resolve(makeFakeSurvey()))
     }
   }
   return new LoadSurveyByIdRepositoryStub()
 }
 
-const makeSystemUnderTest = ():SystemUnderTestTypes => {
+const makeSystemUnderTest = (): SystemUnderTestTypes => {
   const loadSurveyByIdRepositoryStub = makeLoadSurveyByIdRepository()
   const systemUnderTest = new DbLoadSurveyById(loadSurveyByIdRepositoryStub)
   return {
     systemUnderTest,
-    loadSurveyByIdRepositoryStub
+    loadSurveyByIdRepositoryStub,
   }
 }
 
@@ -45,7 +51,10 @@ describe('DbLoadSurveyById', () => {
   })
 
   test('Should call LoadSurveyByIdRepository', async () => {
-    const { systemUnderTest, loadSurveyByIdRepositoryStub } = makeSystemUnderTest()
+    const {
+      systemUnderTest,
+      loadSurveyByIdRepositoryStub,
+    } = makeSystemUnderTest()
     const loadByIdSpy = jest.spyOn(loadSurveyByIdRepositoryStub, 'loadById')
     await systemUnderTest.loadById('any_id')
 
@@ -60,10 +69,14 @@ describe('DbLoadSurveyById', () => {
   })
 
   test('Should throws if LoadSurveyByIdRepository throws', async () => {
-    const { systemUnderTest, loadSurveyByIdRepositoryStub } = makeSystemUnderTest()
-    jest.spyOn(loadSurveyByIdRepositoryStub, 'loadById')
+    const {
+      systemUnderTest,
+      loadSurveyByIdRepositoryStub,
+    } = makeSystemUnderTest()
+    jest
+      .spyOn(loadSurveyByIdRepositoryStub, 'loadById')
       .mockReturnValueOnce(
-        new Promise((resolve, reject) => reject(new Error()))
+        new Promise((resolve, reject) => reject(new Error())),
       )
     const promise = systemUnderTest.loadById('any_id')
 

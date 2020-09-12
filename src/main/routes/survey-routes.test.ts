@@ -1,29 +1,32 @@
+import { Collection } from 'mongodb'
+import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
 import app from '@main/config/app'
 import { env } from '@main/config/env'
-import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
-import { Collection } from 'mongodb'
 import request from 'supertest'
 import { sign } from 'jsonwebtoken'
 
 let surveys: Collection
-let accounts:Collection
+let accounts: Collection
 
-const makeAccessToken = async ():Promise<string> => {
+const makeAccessToken = async (): Promise<string> => {
   const account = await accounts.insertOne({
     name: 'valid_name',
     email: 'valid_email@gmail.com',
     password: 'valid_password',
-    role: 'admin'
+    role: 'admin',
   })
   const id = account.ops[0]._id
   const accessToken = sign({ id }, env.secret)
-  await accounts.updateOne({
-    _id: id
-  }, {
-    $set: {
-      accessToken
-    }
-  })
+  await accounts.updateOne(
+    {
+      _id: id,
+    },
+    {
+      $set: {
+        accessToken,
+      },
+    },
+  )
   return accessToken
 }
 
@@ -43,15 +46,20 @@ describe('AddSurvey Routes', () => {
 
   describe('POST/surveys', () => {
     test('Should return 403 on add survey withdout accessToken', async () => {
-      await request(app).post('/api/surveys').send({
-        question: 'any_question',
-        answers: [{
-          image: 'any_image',
-          answer: 'any_answer'
-        }, {
-          answer: 'other_answer'
-        }]
-      })
+      await request(app)
+        .post('/api/surveys')
+        .send({
+          question: 'any_question',
+          answers: [
+            {
+              image: 'any_image',
+              answer: 'any_answer',
+            },
+            {
+              answer: 'other_answer',
+            },
+          ],
+        })
         .expect(403)
     })
 
@@ -62,11 +70,13 @@ describe('AddSurvey Routes', () => {
         .set('x-access-token', accessToken)
         .send({
           question: 'any_question',
-          answers: [{
-            answer: 'any_answer',
-            image: 'https://images.com.br/profile?image=1'
-          }],
-          date: new Date()
+          answers: [
+            {
+              answer: 'any_answer',
+              image: 'https://images.com.br/profile?image=1',
+            },
+          ],
+          date: new Date(),
         })
         .expect(204)
     })

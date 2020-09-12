@@ -6,10 +6,10 @@ export const signin = {
       content: {
         'application/json': {
           schema: {
-            $ref: '#/schemas/signin'
-          }
-        }
-      }
+            $ref: '#/schemas/signin',
+          },
+        },
+      },
     },
     responses: {
       200: {
@@ -17,23 +17,23 @@ export const signin = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/schemas/account'
-            }
-          }
-        }
+              $ref: '#/schemas/account',
+            },
+          },
+        },
       },
       400: {
-        $ref: '#/components/badRequest'
+        $ref: '#/components/badRequest',
       },
       401: {
-        $ref: '#/components/unauthorized'
+        $ref: '#/components/unauthorized',
       },
       404: {
-        $ref: '#/components/notFound'
+        $ref: '#/components/notFound',
       },
       500: {
-        $ref: '#/components/serverError'
-      }
-    }
-  }
+        $ref: '#/components/serverError',
+      },
+    },
+  },
 }

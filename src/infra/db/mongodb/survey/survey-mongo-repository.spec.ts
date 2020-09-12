@@ -1,9 +1,9 @@
 import { AddSurveyParams } from '@domain/usecases/survey/add-survey'
+import { Collection } from 'mongodb'
 import { MongoHelper } from '@infra/db/mongodb/helpers/mongo-helper'
 import { SurveyMongoRepository } from '@infra/db/mongodb/survey/survey-mongo-repository'
-import { Collection } from 'mongodb'
 
-const makeSystemUnderTest = ():SurveyMongoRepository => {
+const makeSystemUnderTest = (): SurveyMongoRepository => {
   return new SurveyMongoRepository()
 }
 
@@ -11,20 +11,24 @@ const makeFakeSurveys = (): AddSurveyParams[] => {
   return [
     {
       question: 'any_question',
-      answers: [{
-        answer: 'any_answer',
-        image: 'any_image'
-      }],
-      date: new Date()
+      answers: [
+        {
+          answer: 'any_answer',
+          image: 'any_image',
+        },
+      ],
+      date: new Date(),
     },
     {
       question: 'other_question',
-      answers: [{
-        answer: 'other_answer',
-        image: 'other_image'
-      }],
-      date: new Date()
-    }
+      answers: [
+        {
+          answer: 'other_answer',
+          image: 'other_image',
+        },
+      ],
+      date: new Date(),
+    },
   ]
 }
 
@@ -48,15 +52,20 @@ describe('SurveyMongoRepository', () => {
       const systemUnderTest = makeSystemUnderTest()
       await systemUnderTest.add({
         question: 'any_question',
-        answers: [{
-          image: 'any_image',
-          answer: 'any_answer'
-        }, {
-          answer: 'other_answer'
-        }],
-        date: new Date()
+        answers: [
+          {
+            image: 'any_image',
+            answer: 'any_answer',
+          },
+          {
+            answer: 'other_answer',
+          },
+        ],
+        date: new Date(),
       })
-      const survey = await surveyCollection.findOne({ question: 'any_question' })
+      const survey = await surveyCollection.findOne({
+        question: 'any_question',
+      })
       expect(survey).toBeTruthy()
     })
   })
@@ -85,10 +94,12 @@ describe('SurveyMongoRepository', () => {
     test('Should load survey by id on success', async () => {
       const result = await surveyCollection.insertOne({
         question: 'any_question',
-        answers: [{
-          image: 'any_image',
-          answer: 'any_answer'
-        }]
+        answers: [
+          {
+            image: 'any_image',
+            answer: 'any_answer',
+          },
+        ],
       })
       const id = result.ops[0]._id
       const systemUnderTest = makeSystemUnderTest()

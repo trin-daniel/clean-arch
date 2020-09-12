@@ -2,28 +2,26 @@ import {
   AddSurvey,
   AddSurveyParams,
   HttpRequest,
-  Validation
+  Validation,
 } from '@presentation/controllers/survey/add-survey/add-survey-controller-protocols'
-
 import {
   badRequest,
+  noContent,
   serverError,
-  noContent
 } from '@presentation/helpers/http/http-helper'
+import { reset, set } from 'mockdate'
 
 import { AddSurveyController } from '@presentation/controllers/survey/add-survey/add-survey-controller'
 
-import { set, reset } from 'mockdate'
-
 type SutTypes = {
   sut: AddSurveyController
-  validationStub: Validation,
+  validationStub: Validation
   addSurveyStub: AddSurvey
 }
 
 const mockValidation = (): Validation => {
   class ValidationStub implements Validation {
-    validate (input: any):Error {
+    validate(input: any): Error {
       return null
     }
   }
@@ -32,8 +30,8 @@ const mockValidation = (): Validation => {
 
 const mockAddSurvey = (): AddSurvey => {
   class AddSurveyStub implements AddSurvey {
-    add (data: AddSurveyParams):Promise<void> {
-      return new Promise(resolve => resolve())
+    add(data: AddSurveyParams): Promise<void> {
+      return new Promise((resolve) => resolve())
     }
   }
 
@@ -47,19 +45,21 @@ const makeSut = (): SutTypes => {
   return {
     sut,
     validationStub,
-    addSurveyStub
+    addSurveyStub,
   }
 }
 
-const mockRequest = ():HttpRequest => ({
+const mockRequest = (): HttpRequest => ({
   body: {
     question: 'any_question',
-    answers: [{
-      image: 'any_image',
-      answer: 'any_answer'
-    }],
-    date: new Date()
-  }
+    answers: [
+      {
+        image: 'any_image',
+        answer: 'any_answer',
+      },
+    ],
+    date: new Date(),
+  },
 })
 
 describe('AddSurvey Controller', () => {
@@ -97,7 +97,9 @@ describe('AddSurvey Controller', () => {
 
   test('Should returns 500 if AddSurvey throws', async () => {
     const { sut, addSurveyStub } = makeSut()
-    jest.spyOn(addSurveyStub, 'add').mockReturnValueOnce(Promise.reject(new Error()))
+    jest
+      .spyOn(addSurveyStub, 'add')
+      .mockReturnValueOnce(Promise.reject(new Error()))
 
     const response = await sut.handle(mockRequest())
     expect(response).toEqual(serverError(new Error()))

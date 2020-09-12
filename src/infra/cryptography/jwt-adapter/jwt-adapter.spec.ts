@@ -1,13 +1,13 @@
-import jwt from 'jsonwebtoken'
 import { JwtAdapter } from '@infra/cryptography/jwt-adapter/jwt-adapter'
+import jwt from 'jsonwebtoken'
 
 jest.mock('jsonwebtoken', () => ({
-  async sign (): Promise<string> {
-    return new Promise(resolve => resolve('any_token'))
+  async sign(): Promise<string> {
+    return new Promise((resolve) => resolve('any_token'))
   },
-  async verify ():Promise<string> {
-    return new Promise(resolve => resolve('any_value'))
-  }
+  async verify(): Promise<string> {
+    return new Promise((resolve) => resolve('any_value'))
+  },
 }))
 
 const makeSystemUnderTest = (): JwtAdapter => {
@@ -31,8 +31,9 @@ describe('Jwt Adapter', () => {
 
     test('Should throw if sign throws', async () => {
       const systemUnderTest = makeSystemUnderTest()
-      jest.spyOn(jwt, 'sign')
-        .mockImplementationOnce(() => { throw new Error() })
+      jest.spyOn(jwt, 'sign').mockImplementationOnce(() => {
+        throw new Error()
+      })
       const promise = systemUnderTest.encrypt('any_id')
       await expect(promise).rejects.toThrow()
     })
@@ -55,7 +56,9 @@ describe('Jwt Adapter', () => {
 
     test('Should throw if verify throws', async () => {
       const systemUnderTest = makeSystemUnderTest()
-      jest.spyOn(jwt, 'verify').mockImplementationOnce(() => { throw new Error() })
+      jest.spyOn(jwt, 'verify').mockImplementationOnce(() => {
+        throw new Error()
+      })
       const promise = systemUnderTest.decrypt('any_token')
       await expect(promise).rejects.toThrow()
     })
