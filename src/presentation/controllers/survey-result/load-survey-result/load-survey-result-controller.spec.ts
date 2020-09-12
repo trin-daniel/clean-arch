@@ -4,6 +4,7 @@ import { SurveyModel } from '../../../../domain/models/survey'
 import { forbidden, serverError, success } from '../../../helpers/http/http-helper'
 import { InvalidParamErrors } from '../../../errors/'
 import { SurveyResultModel } from '../../../../domain/models/survey-result'
+import { reset, set } from 'mockdate'
 
 type SutTypes = {
 sut: LoadSurveyResultController,
@@ -72,6 +73,14 @@ const makeSut = (): SutTypes => {
 }
 
 describe('LoadSurveyResult Controller', () => {
+  beforeAll(() => {
+    set(new Date())
+  })
+
+  afterAll(() => {
+    reset()
+  })
+
   test('Should call LoadSurveyById with correct value', async () => {
     const { sut, loadSurveyByIdStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadSurveyByIdStub, 'loadById')
