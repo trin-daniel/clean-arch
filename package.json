@@ -1,5 +1,5 @@
 {
-  "name": "clean-arch",
+  "name": "clean-architecture",
   "version": "2.0.0",
   "description": "application developed during clean architecture training",
   "scripts": {
