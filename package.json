@@ -1,6 +1,6 @@
 {
   "name": "clean-node-api",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "application developed during clean architecture training",
   "scripts": {
     "start": "node dist/main/server.js",
